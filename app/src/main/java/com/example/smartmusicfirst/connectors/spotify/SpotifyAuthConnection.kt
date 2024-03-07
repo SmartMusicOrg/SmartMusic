@@ -19,11 +19,19 @@ import java.util.Properties
  * authorization code/access token that can subsequently be used to play music or in requests
  * to the API.
  */
+
+/**
+ * Listener interface for handling Spotify authentication events.
+ * Implement this interface to receive notifications when the Spotify authentication is successful or fails.
+ */
 interface SpotifyAuthConnectionListener {
     fun onSpotifyAuthSuccess(accessToken: String)
     fun onSpotifyAuthFailure(error: Throwable)
 }
 
+/**
+ * Singleton object responsible for managing the authentication to Spotify.
+ */
 object SpotifyAuthConnection {
     private var spotifyAuthConnectionListener: SpotifyAuthConnectionListener? = null
 
@@ -31,6 +39,13 @@ object SpotifyAuthConnection {
     private var clientId: String = ""
     private var redirectUri: String = ""
 
+    /**
+     * Initializes the Spotify authentication connection using the provided activity and notifies
+     * the listener when the authentication is successful or fails.
+     *
+     * @param activity The activity used to establish the authentication.
+     * @param listener The listener to be added to the list of SpotifyAuthConnectionListeners.
+     */
     fun initAuthConnection(activity: Activity, listener: SpotifyAuthConnectionListener) {
         spotifyAuthConnectionListener = listener
         val properties = Properties()
@@ -59,9 +74,13 @@ object SpotifyAuthConnection {
         AuthorizationClient.openLoginActivity(activity, requestCode, request)
     }
 
-
-
-
+    /**
+     * Handles the result of the authentication request.
+     *
+     * @param requestCode The request code used to start the authentication request.
+     * @param resultCode The result code of the authentication request.
+     * @param data The data returned from the authentication request.
+     */
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val response = AuthorizationClient.getResponse(resultCode, data)
         when (response.type) {
