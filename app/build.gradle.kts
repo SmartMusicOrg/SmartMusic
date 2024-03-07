@@ -66,7 +66,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation(files("../libs/spotify-app-remote-release-0.8.0.aar"))
     implementation("com.spotify.android:auth:2.1.0")
-//    implementation(files("../libs/spotify-auth-release-2.1.0.aar"))
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.browser:browser:1.8.0")
@@ -78,7 +77,4 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-    // Spotify wrapper:
-//    implementation("com.github.kaaes:spotify-web-api-android:0.4.1")
 }
