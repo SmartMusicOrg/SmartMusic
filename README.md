@@ -23,7 +23,7 @@ To run the code as a developer, you will need the following:
 <ul>
     <li>Android Studio</li>
     <li>Spotify Developer Account</li>
-</ul>
+</ul><br>
 <a href="#smartmusic">Back to top</a>
 
 ### Installation
@@ -42,7 +42,7 @@ These instructions will get you a copy of the project up and running on your loc
     </li>
     <li>Run the application</li>
 * if you run into any issues, please let me know
-</ul>
+</ul><br>
 <a href="#smartmusic">Back to top</a>
 
 ## Versioning
@@ -51,14 +51,14 @@ This project build in Android Studio Iguana | 2023.2.1 , AGP(gradle) 8.3.0 and u
     <li><a href = "https://search.maven.org/artifact/org.immutables/gson/2.10.1/jar">Gson Package</a></li>
     <li><a href = "https://search.maven.org/artifact/com.android.volley/volley/1.2.1/aar">Volley Package</a></li>
     <li><a href = "https://search.maven.org/artifact/com.spotify.android/auth/2.1.0/aar">Spotify Auth Package</a></li>
-</ul>
+</ul><br>
 <a href="#smartmusic">Back to top</a>
 
 ## Using Spotify In Android
-in coming soon
+Coming soon...<br>
 <a href="#smartmusic">Back to top</a>
 
 ## Contact
-If you have any questions, please feel free to contact us at '''finalprojectmanager@gmail.com'''
+If you have any questions, please feel free to contact us at finalprojectmanager@gmail.com.<br>
 <a href="#smartmusic">Back to top</a>
 
