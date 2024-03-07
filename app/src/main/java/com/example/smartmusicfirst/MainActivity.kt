@@ -1,0 +1,185 @@
+package com.example.smartmusicfirst
+
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.example.smartmusicfirst.connectors.spotify.SporifyWebApi.searchForPlaylist
+import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnection
+import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnectionListener
+import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
+import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
+
+const val TAG = "MainActivity"
+var accessToken: String = ""
+
+class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuthConnectionListener {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                MySimpleAppContainer(
+                    Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(),
+                    context = this@MainActivity
+                )
+            }
+        }
+        SpotifyAuthConnection.initAuthConnection(this, this)
+    }
+
+    override fun onSpotifyConnected() {
+        Log.d(TAG, "Spotify connected")
+//        connected()
+    }
+
+    // TODO to remove the onStart:
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, accessToken)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        SpotifyConnection.disconnect()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Pause the music before disconnecting
+        SpotifyConnection.getPlayerApi()?.pause()
+        SpotifyConnection.disconnect()
+    }
+
+    override fun onSpotifyAuthSuccess(_accessToken: String) {
+        Log.d(TAG, "Spotify authentication successful, Access Token: $_accessToken")
+        accessToken = _accessToken
+        SpotifyConnection.connect(this, this)
+    }
+
+    override fun onSpotifyAuthFailure(error: Throwable) {
+        Log.e(TAG, "Spotify authentication failed: ${error.message}", error)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        SpotifyAuthConnection.onActivityResult(requestCode, resultCode, data)
+    }
+}
+
+fun playPlaylist(playlistId: String) {
+    // Play a playlist
+    Log.d(TAG, "Playing playlist with ID: $playlistId")
+    val playlistURI = "spotify:playlist:$playlistId"
+    SpotifyConnection.getPlayerApi()?.play(playlistURI)
+    // Subscribe to PlayerState if needed
+}
+
+@Composable
+fun SimpleButton(text: String, triggered: () -> Unit, color: Color, modifier: Modifier = Modifier) {
+    Button(
+        onClick = triggered,
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        modifier = Modifier.width(300.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(1.dp)
+        )
+    }
+}
+
+@Composable
+fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        SimpleButton("Happy", {
+            searchForPlaylist(context, "happy", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
+                }
+            }
+        }, color = Color.Green)
+        SimpleButton("Excited", {
+            searchForPlaylist(context, "Excited", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
+                }
+            }
+        }, color = Color(0xFFFFD151))
+        SimpleButton("Angry", {
+            searchForPlaylist(context, "Angry", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
+                }
+            }
+        }, color = Color.Red)
+        SimpleButton("Optimistic", {
+            searchForPlaylist(context, "Optimistic", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
+                }
+            }
+        }, color = Color.Blue)
+        SimpleButton("Sad", {
+            searchForPlaylist(context, "Sad", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
+                }
+            }
+        }, color = Color.Gray)
+        SimpleButton("Energized", {
+            searchForPlaylist(context, "Energized", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
+                }
+            }
+        }, color = Color.Cyan)
+    }
+}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    SmartMusicFirstTheme {
+//        MySimpleAppContainer(
+//            Modifier
+//                .fillMaxSize()
+//                .wrapContentSize(),
+//            context = this@MainActivity
+//        )
+//    }
+//}
