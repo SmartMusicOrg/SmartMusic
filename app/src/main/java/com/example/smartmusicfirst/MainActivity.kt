@@ -1,6 +1,5 @@
 package com.example.smartmusicfirst
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,12 +19,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.smartmusicfirst.connectors.spotify.SporifyWebApi.searchForPlaylist
+import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi.searchForPlaylist
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
+import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
+import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 
 const val TAG = "MainActivity"
 var accessToken: String = ""
@@ -41,12 +43,13 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
                 MySimpleAppContainer(
                     Modifier
                         .fillMaxSize()
-                        .wrapContentSize(),
-                    context = this@MainActivity
+                        .wrapContentSize()
                 )
             }
         }
         SpotifyAuthConnection.initAuthConnection(this, this)
+        // Initialize SpotifyWebApi with the application context
+        SpotifyWebApi.init(applicationContext)
     }
 
     override fun onSpotifyConnected() {
@@ -58,6 +61,9 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
     override fun onStart() {
         super.onStart()
         Log.d(TAG, accessToken)
+        if (!SpotifyConnection.isConnected()) {
+            SpotifyConnection.connect(this, this)
+        }
     }
 
     override fun onStop() {
@@ -72,9 +78,9 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
         SpotifyConnection.disconnect()
     }
 
-    override fun onSpotifyAuthSuccess(_accessToken: String) {
-        Log.d(TAG, "Spotify authentication successful, Access Token: $_accessToken")
-        accessToken = _accessToken
+    override fun onSpotifyAuthSuccess(accessToken: String) {
+        Log.d(TAG, "Spotify authentication successful, Access Token: $accessToken")
+        com.example.smartmusicfirst.accessToken = accessToken
         SpotifyConnection.connect(this, this)
     }
 
@@ -82,6 +88,8 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
         Log.e(TAG, "Spotify authentication failed: ${error.message}", error)
     }
 
+    // TODO change the onActivityResult to better handle the SpotifyAuthConnection
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         SpotifyAuthConnection.onActivityResult(requestCode, resultCode, data)
@@ -101,7 +109,7 @@ fun SimpleButton(text: String, triggered: () -> Unit, color: Color, modifier: Mo
     Button(
         onClick = triggered,
         colors = ButtonDefaults.buttonColors(containerColor = color),
-        modifier = Modifier.width(300.dp)
+        modifier = modifier.width(300.dp)
     ) {
         Text(
             text = text,
@@ -112,10 +120,10 @@ fun SimpleButton(text: String, triggered: () -> Unit, color: Color, modifier: Mo
 }
 
 @Composable
-fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
+fun MySimpleAppContainer(modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         SimpleButton("Happy", {
-            searchForPlaylist(context, "happy", accessToken) { playlistId ->
+            searchForPlaylist( "happy", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -124,7 +132,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
             }
         }, color = Color.Green)
         SimpleButton("Excited", {
-            searchForPlaylist(context, "Excited", accessToken) { playlistId ->
+            searchForPlaylist("Excited", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -133,7 +141,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
             }
         }, color = Color(0xFFFFD151))
         SimpleButton("Angry", {
-            searchForPlaylist(context, "Angry", accessToken) { playlistId ->
+            searchForPlaylist("Angry", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -142,7 +150,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
             }
         }, color = Color.Red)
         SimpleButton("Optimistic", {
-            searchForPlaylist(context, "Optimistic", accessToken) { playlistId ->
+            searchForPlaylist( "Optimistic", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -151,7 +159,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
             }
         }, color = Color.Blue)
         SimpleButton("Sad", {
-            searchForPlaylist(context, "Sad", accessToken) { playlistId ->
+            searchForPlaylist( "Sad", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -160,7 +168,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
             }
         }, color = Color.Gray)
         SimpleButton("Energized", {
-            searchForPlaylist(context, "Energized", accessToken) { playlistId ->
+            searchForPlaylist( "Energized", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -171,15 +179,14 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier, context: Context) {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    SmartMusicFirstTheme {
-//        MySimpleAppContainer(
-//            Modifier
-//                .fillMaxSize()
-//                .wrapContentSize(),
-//            context = this@MainActivity
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    SmartMusicFirstTheme {
+        MySimpleAppContainer(
+            Modifier
+                .fillMaxSize()
+                .wrapContentSize()
+        )
+    }
+}

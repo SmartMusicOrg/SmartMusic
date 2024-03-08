@@ -55,8 +55,8 @@ object SpotifyAuthConnection {
             properties.load(inputStream)
 
             // Read the client ID and redirect URI from the properties
-            SpotifyAuthConnection.clientId = properties.getProperty("spotify_client_id")
-            SpotifyAuthConnection.redirectUri = properties.getProperty("spotify_redirect_uri")
+            clientId = properties.getProperty("spotify_client_id")
+            redirectUri = properties.getProperty("spotify_redirect_uri")
         } catch (e: Exception) {
             Log.e(TAG, "Error loading Spotify config: ${e.message}", e)
         }
