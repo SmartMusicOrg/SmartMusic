@@ -123,7 +123,7 @@ fun SimpleButton(text: String, triggered: () -> Unit, color: Color, modifier: Mo
 fun MySimpleAppContainer(modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         SimpleButton("Happy", {
-            searchForPlaylist( "happy", accessToken) { playlistId ->
+            searchForPlaylist( "happy mood", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -132,7 +132,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier) {
             }
         }, color = Color.Green)
         SimpleButton("Excited", {
-            searchForPlaylist("Excited", accessToken) { playlistId ->
+            searchForPlaylist("Excited mood", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -141,7 +141,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier) {
             }
         }, color = Color(0xFFFFD151))
         SimpleButton("Angry", {
-            searchForPlaylist("Angry", accessToken) { playlistId ->
+            searchForPlaylist("Angry mood", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -150,7 +150,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier) {
             }
         }, color = Color.Red)
         SimpleButton("Optimistic", {
-            searchForPlaylist( "Optimistic", accessToken) { playlistId ->
+            searchForPlaylist( "Optimistic mood", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -159,7 +159,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier) {
             }
         }, color = Color.Blue)
         SimpleButton("Sad", {
-            searchForPlaylist( "Sad", accessToken) { playlistId ->
+            searchForPlaylist( "Sad mood", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
@@ -168,7 +168,7 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier) {
             }
         }, color = Color.Gray)
         SimpleButton("Energized", {
-            searchForPlaylist( "Energized", accessToken) { playlistId ->
+            searchForPlaylist( "Energized mood", accessToken) { playlistId ->
                 if (playlistId.isNotEmpty()) {
                     playPlaylist(playlistId)
                 } else {
