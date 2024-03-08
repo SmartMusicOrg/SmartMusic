@@ -105,9 +105,16 @@ fun playPlaylist(playlistId: String) {
 }
 
 @Composable
-fun SimpleButton(text: String, triggered: () -> Unit, color: Color, modifier: Modifier = Modifier) {
+fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
     Button(
-        onClick = triggered,
+        onClick = {
+            searchForPlaylist( "$text mood", accessToken) { playlistId ->
+            if (playlistId.isNotEmpty()) {
+                playPlaylist(playlistId)
+            } else {
+                Log.e(TAG, "No playlist found")
+            }
+        }},
         colors = ButtonDefaults.buttonColors(containerColor = color),
         modifier = modifier.width(300.dp)
     ) {
@@ -122,60 +129,12 @@ fun SimpleButton(text: String, triggered: () -> Unit, color: Color, modifier: Mo
 @Composable
 fun MySimpleAppContainer(modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        SimpleButton("Happy", {
-            searchForPlaylist( "happy mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        }, color = Color.Green)
-        SimpleButton("Excited", {
-            searchForPlaylist("Excited mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        }, color = Color(0xFFFFD151))
-        SimpleButton("Angry", {
-            searchForPlaylist("Angry mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        }, color = Color.Red)
-        SimpleButton("Optimistic", {
-            searchForPlaylist( "Optimistic mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        }, color = Color.Blue)
-        SimpleButton("Sad", {
-            searchForPlaylist( "Sad mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        }, color = Color.Gray)
-        SimpleButton("Energized", {
-            searchForPlaylist( "Energized mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        }, color = Color.Cyan)
+        SimpleButton("Happy", color = Color.Green)
+        SimpleButton("Excited", color = Color(0xFFFFD151))
+        SimpleButton("Angry",  color = Color.Red)
+        SimpleButton("Optimistic", color = Color.Blue)
+        SimpleButton("Sad",  color = Color.Gray)
+        SimpleButton("Energized", color = Color.Cyan)
     }
 }
 
