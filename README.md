@@ -55,7 +55,7 @@ This project build in Android Studio Iguana | 2023.2.1 , AGP(gradle) 8.3.0 and u
 <a href="#smartmusic">Back to top</a>
 
 ## Using Spotify In Android
-Coming soon...<br>
+Check our wiki for guidance<br>
 <a href="#smartmusic">Back to top</a>
 
 ## Contact
