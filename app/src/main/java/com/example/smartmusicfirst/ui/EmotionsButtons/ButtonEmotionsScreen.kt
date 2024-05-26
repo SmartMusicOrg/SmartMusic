@@ -19,39 +19,37 @@ import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.playPlaylist
 
 
-class ButtonEmotionsScreen {
-    @Composable
-    fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
-        Button(
-            onClick = {
-                SpotifyWebApi.searchForPlaylist( "$text mood", accessToken) { playlistId ->
-                    if (playlistId.isNotEmpty()) {
-                        playPlaylist(playlistId)
-                    } else {
-                        Log.e(TAG, "No playlist found")
-                    }
+@Composable
+fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
+    Button(
+        onClick = {
+            SpotifyWebApi.searchForPlaylist("$text mood", accessToken) { playlistId ->
+                if (playlistId.isNotEmpty()) {
+                    playPlaylist(playlistId)
+                } else {
+                    Log.e(TAG, "No playlist found")
                 }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = color),
-            modifier = modifier.width(300.dp)
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(1.dp)
-            )
-        }
+            }
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = color),
+        modifier = modifier.width(300.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(1.dp)
+        )
     }
+}
 
-    @Composable
-    fun MySimpleAppContainer(modifier: Modifier = Modifier) {
-        Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-            SimpleButton("Happy", color = Color.Green)
-            SimpleButton("Excited", color = Color(0xFFFFD151))
-            SimpleButton("Angry",  color = Color.Red)
-            SimpleButton("Optimistic", color = Color.Blue)
-            SimpleButton("Sad",  color = Color.Gray)
-            SimpleButton("Energized", color = Color.Cyan)
-        }
+@Composable
+fun MySimpleAppContainer(modifier: Modifier = Modifier) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        SimpleButton("Happy", color = Color.Green)
+        SimpleButton("Excited", color = Color(0xFFFFD151))
+        SimpleButton("Angry", color = Color.Red)
+        SimpleButton("Optimistic", color = Color.Blue)
+        SimpleButton("Sad", color = Color.Gray)
+        SimpleButton("Energized", color = Color.Cyan)
     }
 }

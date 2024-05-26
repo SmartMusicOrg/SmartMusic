@@ -27,6 +27,7 @@ import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnectionListe
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
+import com.example.smartmusicfirst.ui.SmartMusicScreen
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 
 const val TAG = "MainActivity"
@@ -40,7 +41,7 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                MySimpleAppContainer(
+                SmartMusicScreen(
                     Modifier
                         .fillMaxSize()
                         .wrapContentSize()
@@ -103,49 +104,38 @@ fun playPlaylist(playlistId: String) {
     SpotifyConnection.getPlayerApi()?.play(playlistURI)
     // Subscribe to PlayerState if needed
 }
+//
+//@Composable
+//fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
+//    Button(
+//        onClick = {
+//            searchForPlaylist( "$text mood", accessToken) { playlistId ->
+//            if (playlistId.isNotEmpty()) {
+//                playPlaylist(playlistId)
+//            } else {
+//                Log.e(TAG, "No playlist found")
+//            }
+//        }},
+//        colors = ButtonDefaults.buttonColors(containerColor = color),
+//        modifier = modifier.width(300.dp)
+//    ) {
+//        Text(
+//            text = text,
+//            style = MaterialTheme.typography.labelLarge,
+//            modifier = Modifier.padding(1.dp)
+//        )
+//    }
+//}
+//
+//@Composable
+//fun MySimpleAppContainer(modifier: Modifier = Modifier) {
+//    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+//        SimpleButton("Happy", color = Color.Green)
+//        SimpleButton("Excited", color = Color(0xFFFFD151))
+//        SimpleButton("Angry",  color = Color.Red)
+//        SimpleButton("Optimistic", color = Color.Blue)
+//        SimpleButton("Sad",  color = Color.Gray)
+//        SimpleButton("Energized", color = Color.Cyan)
+//    }
+//}
 
-@Composable
-fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
-    Button(
-        onClick = {
-            searchForPlaylist( "$text mood", accessToken) { playlistId ->
-            if (playlistId.isNotEmpty()) {
-                playPlaylist(playlistId)
-            } else {
-                Log.e(TAG, "No playlist found")
-            }
-        }},
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        modifier = modifier.width(300.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(1.dp)
-        )
-    }
-}
-
-@Composable
-fun MySimpleAppContainer(modifier: Modifier = Modifier) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        SimpleButton("Happy", color = Color.Green)
-        SimpleButton("Excited", color = Color(0xFFFFD151))
-        SimpleButton("Angry",  color = Color.Red)
-        SimpleButton("Optimistic", color = Color.Blue)
-        SimpleButton("Sad",  color = Color.Gray)
-        SimpleButton("Energized", color = Color.Cyan)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SmartMusicFirstTheme {
-        MySimpleAppContainer(
-            Modifier
-                .fillMaxSize()
-                .wrapContentSize()
-        )
-    }
-}

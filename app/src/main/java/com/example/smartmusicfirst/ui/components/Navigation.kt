@@ -1,6 +1,8 @@
 package com.example.smartmusicfirst.ui.components
 
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -8,8 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.smartmusicfirst.data.Routs
+import com.example.smartmusicfirst.ui.EmotionsButtons.MySimpleAppContainer
 import com.example.smartmusicfirst.ui.PlaceHolder.PlaceHolderScreen
 
 @Composable
@@ -88,6 +90,14 @@ fun NavigationMenu(
                 title = "Missing",
                 message = "This page is not implemented yet.",
                 modifier = modifier.fillMaxHeight()
+            )
+        }
+
+        composable(Routs.EmotionsButtons.name) {
+            MySimpleAppContainer(
+                modifier = modifier
+                    .fillMaxSize()
+                    .wrapContentSize()
             )
         }
 
