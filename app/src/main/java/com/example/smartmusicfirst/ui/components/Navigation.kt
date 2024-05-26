@@ -15,7 +15,7 @@ import com.example.smartmusicfirst.ui.PlaceHolder.PlaceHolderScreen
 @Composable
 fun NavigationMenu(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Routs.valueOf(backStackEntry?.destination?.route ?: Routs.HomePage.name)
