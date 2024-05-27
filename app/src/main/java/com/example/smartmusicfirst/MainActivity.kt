@@ -5,30 +5,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi.searchForPlaylist
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
-import com.example.smartmusicfirst.ui.SmartMusicScreen
-import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
+import com.example.smartmusicfirst.ui.views.SmartMusicScreen
 
 const val TAG = "MainActivity"
 var accessToken: String = ""

@@ -3,10 +3,12 @@ package com.example.smartmusicfirst.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.smartmusicfirst.data.LocalDataSource
@@ -28,10 +30,12 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier = Modi
                     )
                 },
                 label = {
-//                    Text(
-//                        text = stringResource(id = item.title),
-//                        modifier = Modifier
-//                    )
+                    if (item.iconTitle != null && currentScreen.name==item.route) {
+                        Text(
+                            text = stringResource(id = item.iconTitle),
+                            modifier = Modifier
+                        )
+                    }
                 },
                 selected = currentScreen.name == item.route,
                 onClick = {

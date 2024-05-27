@@ -1,6 +1,5 @@
 package com.example.smartmusicfirst.ui.components
 
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
@@ -11,8 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.smartmusicfirst.data.Routs
-import com.example.smartmusicfirst.ui.EmotionsButtons.MySimpleAppContainer
-import com.example.smartmusicfirst.ui.PlaceHolder.PlaceHolderScreen
+import com.example.smartmusicfirst.ui.views.MySimpleAppContainer
+import com.example.smartmusicfirst.ui.views.PlaceHolderScreen
 
 @Composable
 fun NavigationMenu(
@@ -31,7 +30,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -39,7 +38,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -49,7 +48,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -57,7 +56,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -65,7 +64,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -73,7 +72,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -81,7 +80,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 
@@ -89,7 +88,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxHeight()
+                modifier = modifier.fillMaxSize()
             )
         }
 

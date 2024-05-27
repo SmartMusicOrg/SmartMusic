@@ -1,4 +1,4 @@
-package com.example.smartmusicfirst.ui.EmotionsButtons
+package com.example.smartmusicfirst.ui.views
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column

@@ -1,4 +1,4 @@
-package com.example.smartmusicfirst.ui
+package com.example.smartmusicfirst.ui.views
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.smartmusicfirst.data.Routs
 import com.example.smartmusicfirst.ui.components.BottomNavigation
 import com.example.smartmusicfirst.ui.components.NavigationMenu
+import com.example.smartmusicfirst.ui.components.SmartMusicTopBar
 
 @Composable
 fun SmartMusicScreen(
@@ -22,7 +23,10 @@ fun SmartMusicScreen(
 
     Scaffold(
         topBar = {
-            //TODO TopBar(currentScreen = currentScreen)
+            SmartMusicTopBar(
+                currentScreen = currentScreen,
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() })
         },
         bottomBar = {
             BottomNavigation(navController = navController)
