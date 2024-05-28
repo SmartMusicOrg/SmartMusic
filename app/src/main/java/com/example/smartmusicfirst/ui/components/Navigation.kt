@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.smartmusicfirst.data.Routs
+import com.example.smartmusicfirst.ui.views.HomePageScreen
 import com.example.smartmusicfirst.ui.views.MySimpleAppContainer
 import com.example.smartmusicfirst.ui.views.PlaceHolderScreen
 
@@ -27,10 +28,11 @@ fun NavigationMenu(
     ) {
 
         composable(Routs.HomePage.name) {
-            PlaceHolderScreen(
-                title = "Missing",
-                message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxSize()
+            HomePageScreen(
+                onNavigateToEmotionButtons = { navController.navigate(Routs.EmotionsButtons.name) },
+                onNavigateToTextCapturing = { navController.navigate(Routs.ImageCapturing.name) },
+                onNavigateToImageCapturing = { navController.navigate(Routs.TextCapturing.name) },
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -41,8 +43,6 @@ fun NavigationMenu(
                 modifier = modifier.fillMaxSize()
             )
         }
-
-        composable(Routs.EmotionsButtons.name) {}
 
         composable(Routs.TextCapturing.name) {
             PlaceHolderScreen(

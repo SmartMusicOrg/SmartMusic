@@ -1,18 +1,34 @@
 <resources>
+
     <string name="app_name">SmartMusicFirst</string>
+
     <string name="homePage_title">Welcome to SmartMusic!</string>
     <string name="homePage_title_icon">Home</string>
+
     <string name="musicPlaysPage_title">Music plays</string>
     <string name="musicPlaysPage_title_icon">Music</string>
+
     <string name="emotionButtonsPage_title">Emotion Buttons</string>
+    <string name="emotionButtonsPage_description">Choose your emotion and get music accordingly...</string>
+
     <string name="textCapturingPage_title">Text Capturing</string>
+    <string name="textCapturingPage_description">Describe your experiences to get beautiful music...</string>
+
+
     <string name="imageCapturingPage_title">Image Capturing</string>
+    <string name="imageCapturingPage_description">Get music by related to interesting image you have...</string>
+
     <string name="PlayerPage_title">Enjoy Listening</string>
+
     <string name="NotificationsPage_title">Notifications</string>
     <string name="NotificationsPage_title_icon">News</string>
+
     <string name="SettingsPage_title">Settings</string>
     <string name="SettingsPage_title_icon">Settings</string>
+
     <string name="ContactUsPage_title">Contact Us</string>
     <string name="ContactUsPage_title_icon">Mail</string>
+
     <string name="PlaceHolderPage_title">Oops!</string>
+
 </resources>

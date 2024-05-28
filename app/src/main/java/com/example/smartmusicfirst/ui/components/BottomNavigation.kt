@@ -30,7 +30,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier = Modi
                     )
                 },
                 label = {
-                    if (item.iconTitle != null && currentScreen.name==item.route) {
+                    if (item.iconTitle != null && currentScreen.name == item.route) {
                         Text(
                             text = stringResource(id = item.iconTitle),
                             modifier = Modifier
@@ -41,7 +41,8 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier = Modi
                 onClick = {
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                            // we want the application to return to homepage when we click it even if we navigate inside it
+                            saveState = false
                         }
                         launchSingleTop = true
                         restoreState = true
