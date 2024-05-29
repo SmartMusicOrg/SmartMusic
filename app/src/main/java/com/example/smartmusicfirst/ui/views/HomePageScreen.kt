@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,26 +28,41 @@ fun HomePageScreen(
     onNavigateToImageCapturing: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
+    LazyColumn(
+        modifier = modifier.background(color = MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
+        verticalArrangement = Arrangement.Center
     ) {
-        ScreenCard(
-            onClick = onNavigateToEmotionButtons,
-            title = R.string.emotionButtonsPage_title,
-            bodyText = R.string.emotionButtonsPage_description
-        )
-        ScreenCard(
-            onClick = onNavigateToTextCapturing,
-            title = R.string.textCapturingPage_title,
-            bodyText = R.string.textCapturingPage_description
-        )
-        ScreenCard(
-            onClick = onNavigateToImageCapturing,
-            title = R.string.imageCapturingPage_title,
-            bodyText = R.string.imageCapturingPage_description
-        )
+        item {
+            ScreenCard(
+                onClick = onNavigateToEmotionButtons,
+                title = R.string.emotionButtonsPage_title,
+                bodyText = R.string.emotionButtonsPage_description,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+        }
+        item {
+            ScreenCard(
+                onClick = onNavigateToTextCapturing,
+                title = R.string.textCapturingPage_title,
+                bodyText = R.string.textCapturingPage_description,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+        }
+        item {
+            ScreenCard(
+                onClick = onNavigateToImageCapturing,
+                title = R.string.imageCapturingPage_title,
+                bodyText = R.string.imageCapturingPage_description,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+        }
     }
 }
 
