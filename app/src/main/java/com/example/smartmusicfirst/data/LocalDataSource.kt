@@ -42,20 +42,20 @@ object LocalDataSource {
                 iconTitle = R.string.NotificationsPage_title_icon
             ),
             NavigationItem(
-                route = Routs.ContactUs.name,
-                title = Routs.ContactUs.title,
-                selectedIcon = Icons.Filled.Email,
-                unselectedIcon = Icons.Outlined.Email,
-                hasNew = false,
-                iconTitle = R.string.ContactUsPage_title_icon
-            ),
-            NavigationItem(
                 route = Routs.Settings.name,
                 title = Routs.Settings.title,
                 selectedIcon = Icons.Filled.Settings,
                 unselectedIcon = Icons.Outlined.Settings,
                 hasNew = false,
                 iconTitle = R.string.SettingsPage_title_icon
+            ),
+            NavigationItem(
+                route = Routs.ContactUs.name,
+                title = Routs.ContactUs.title,
+                selectedIcon = Icons.Filled.Email,
+                unselectedIcon = Icons.Outlined.Email,
+                hasNew = false,
+                iconTitle = R.string.ContactUsPage_title_icon
             )
         )
     }

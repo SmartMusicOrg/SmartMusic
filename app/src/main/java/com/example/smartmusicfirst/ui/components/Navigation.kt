@@ -31,8 +31,8 @@ fun NavigationMenu(
         composable(Routs.HomePage.name) {
             HomePageScreen(
                 onNavigateToEmotionButtons = { navController.navigate(Routs.EmotionsButtons.name) },
-                onNavigateToTextCapturing = { navController.navigate(Routs.ImageCapturing.name) },
-                onNavigateToImageCapturing = { navController.navigate(Routs.TextCapturing.name) },
+                onNavigateToTextCapturing = { navController.navigate(Routs.TextCapturing.name) },
+                onNavigateToImageCapturing = { navController.navigate(Routs.ImageCapturing.name) },
                 modifier = Modifier.fillMaxSize()
             )
         }
