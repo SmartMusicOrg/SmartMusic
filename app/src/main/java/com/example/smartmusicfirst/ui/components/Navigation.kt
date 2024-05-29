@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.smartmusicfirst.data.Routs
+import com.example.smartmusicfirst.ui.views.ContactUsScreen
 import com.example.smartmusicfirst.ui.views.HomePageScreen
 import com.example.smartmusicfirst.ui.views.MySimpleAppContainer
 import com.example.smartmusicfirst.ui.views.PlaceHolderScreen
@@ -86,7 +87,7 @@ fun NavigationMenu(
         }
 
         composable(Routs.ContactUs.name) {
-            PlaceHolderScreen(
+            ContactUsScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
                 modifier = modifier.fillMaxSize()
