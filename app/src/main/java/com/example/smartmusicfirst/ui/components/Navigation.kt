@@ -36,13 +36,14 @@ fun NavigationMenu(
             )
         }
 
-        composable(Routs.MusicPlaysPage.name) {
-            PlaceHolderScreen(
-                title = "Missing",
-                message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxSize()
-            )
-        }
+//       todo remove:
+//        composable(Routs.MusicPlaysPage.name) {
+//            PlaceHolderScreen(
+//                title = "Missing",
+//                message = "This page is not implemented yet.",
+//                modifier = modifier.fillMaxSize()
+//            )
+//        }
 
         composable(Routs.TextCapturing.name) {
             PlaceHolderScreen(

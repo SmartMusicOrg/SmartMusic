@@ -6,7 +6,9 @@ import com.example.smartmusicfirst.R
 enum class Routs(@StringRes val title: Int) {
     // todo make the following work:
     HomePage(title = R.string.homePage_title),
-    MusicPlaysPage(title = R.string.musicPlaysPage_title),
+
+    //   todo remove:
+    //    MusicPlaysPage(title = R.string.musicPlaysPage_title),
     EmotionsButtons(title = R.string.emotionButtonsPage_title),
     TextCapturing(title = R.string.textCapturingPage_title),
     ImageCapturing(title = R.string.imageCapturingPage_title),
