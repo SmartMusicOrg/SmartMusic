@@ -7,8 +7,8 @@ import com.example.smartmusicfirst.accessToken
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.playPlaylist
 
-class ButtonEmotionViewModel: ViewModel(){
-    fun onEmotionButtonClicked(emotion: String){
+class ButtonEmotionViewModel : ViewModel() {
+    fun onEmotionButtonClicked(emotion: String) {
         SpotifyWebApi.searchForPlaylist("$emotion mood", accessToken) { playlistId ->
             if (playlistId.isNotEmpty()) {
                 playPlaylist(playlistId)

@@ -91,3 +91,7 @@ fun playPlaylist(playlistId: String) {
     SpotifyConnection.getPlayerApi()?.play(playlistURI)
     // Subscribe to PlayerState if needed
 }
+
+fun playSong(songUri: String){
+    SpotifyConnection.getPlayerApi()?.play(songUri)
+}
