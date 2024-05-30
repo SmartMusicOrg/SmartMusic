@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
@@ -46,7 +47,7 @@ fun ContactUsScreen(
         TextField(
             value = uiState.emailSubject,
             onValueChange = { contactUsViewModel.updateSubject(it) },
-            placeholder = { Text(text = "Enter email subject") },
+            placeholder = { Text(text = stringResource(id = R.string.enter_email_subject)) },
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.padding_medium))
                 .fillMaxWidth(),
@@ -57,7 +58,7 @@ fun ContactUsScreen(
         TextField(
             value = uiState.emailBody,
             onValueChange = { contactUsViewModel.updateBody(it) },
-            placeholder = { Text(text = "Enter email body") },
+            placeholder = { Text(text = stringResource(id = R.string.enter_email_body)) },
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.padding_medium))
                 .fillMaxWidth()
@@ -77,7 +78,7 @@ fun ContactUsScreen(
 
         }) {
             Text(
-                text = "Send Email",
+                text = stringResource(id = R.string.send_email),
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
                 color = Color.White,
                 style = MaterialTheme.typography.labelLarge

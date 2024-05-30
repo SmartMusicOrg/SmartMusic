@@ -5,10 +5,6 @@
     <string name="homePage_title">Welcome to SmartMusic!</string>
     <string name="homePage_title_icon">Home</string>
 
-<!--    todo remove : -->
-<!--    <string name="musicPlaysPage_title">Music plays</string>-->
-<!--    <string name="musicPlaysPage_title_icon">Music</string>-->
-
     <string name="emotionButtonsPage_title">Emotion Buttons</string>
     <string name="emotionButtonsPage_description">Choose your emotion and get music accordingly...</string>
 
@@ -31,5 +27,9 @@
     <string name="ContactUsPage_title_icon">Mail</string>
 
     <string name="PlaceHolderPage_title">Oops!</string>
+
+    <string name="enter_email_subject">Enter email subject</string>
+    <string name="enter_email_body">Write the email content here</string>
+    <string name="send_email">Send Email</string>
 
 </resources>
