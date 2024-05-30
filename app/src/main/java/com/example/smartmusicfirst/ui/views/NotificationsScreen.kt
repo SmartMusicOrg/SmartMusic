@@ -17,8 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.models.NotificationItem
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 
@@ -52,7 +54,7 @@ fun NotificationItemView(notificationItem: NotificationItem) {
         },
         headlineContent = { Text(text = notificationItem.title) },
         supportingContent = { Text(text = notificationItem.description) },
-        tonalElevation = if (notificationItem.isAlreadyRead) 0.dp else 8.dp,
+        tonalElevation = if (notificationItem.isAlreadyRead) 0.dp else dimensionResource(id = R.dimen.elevation_large),
         modifier = Modifier.clickable { notificationItem.onClick }
     )
 }

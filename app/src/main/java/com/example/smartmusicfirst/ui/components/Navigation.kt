@@ -88,8 +88,6 @@ fun NavigationMenu(
 
         composable(Routs.ContactUs.name) {
             ContactUsScreen(
-                title = "Missing",
-                message = "This page is not implemented yet.",
                 modifier = modifier.fillMaxSize()
             )
         }

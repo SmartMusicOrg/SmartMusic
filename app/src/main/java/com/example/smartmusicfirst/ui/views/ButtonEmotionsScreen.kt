@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,8 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.accessToken
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
@@ -41,8 +40,8 @@ fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
                 }
             }
         },
-        border = ButtonDefaults.outlinedButtonBorder.copy(width = 3.dp),
-        elevation = ButtonDefaults.elevatedButtonElevation(4.dp),
+        border = ButtonDefaults.outlinedButtonBorder.copy(width = dimensionResource(id = R.dimen.border_width_medium)),
+        elevation = ButtonDefaults.elevatedButtonElevation(dimensionResource(id = R.dimen.elevation_large)),
         colors = ButtonDefaults.buttonColors(containerColor = color),
         modifier = modifier.width(300.dp)
     ) {
@@ -50,10 +49,10 @@ fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
             text = text,
             style = MaterialTheme.typography.labelLarge,
             color = Color.Black,
-            modifier = Modifier.padding(1.dp)
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_extra_extra_small))
         )
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
 }
 
 @Composable

@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,7 +41,7 @@ fun HomePageScreen(
                 bodyText = R.string.emotionButtonsPage_description,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
             )
         }
         item {
@@ -50,7 +51,7 @@ fun HomePageScreen(
                 bodyText = R.string.textCapturingPage_description,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
             )
         }
         item {
@@ -60,7 +61,7 @@ fun HomePageScreen(
                 bodyText = R.string.imageCapturingPage_description,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(dimensionResource(id = R.dimen.padding_medium))
             )
         }
     }
@@ -78,26 +79,26 @@ fun ScreenCard(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(dimensionResource(id = R.dimen.padding_small))
     ) {
         // TODO add image
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp)
+                .padding(dimensionResource(id = R.dimen.padding_extra_small))
         ) {
             Text(
                 text = stringResource(id = title),
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
             )
             Text(
                 text = stringResource(id = bodyText),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small))
             )
         }
     }

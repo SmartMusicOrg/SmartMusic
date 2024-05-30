@@ -18,8 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.models.SettingsOnOffItem
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 
@@ -35,7 +36,7 @@ fun SettingsScreen(
     ) {
         items(settingsItemOnOffList.size) { index ->
             SettingsOnOffItemView(settingsItemOnOffList[index])
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_extra_small)))
         }
     }
 }
@@ -43,7 +44,7 @@ fun SettingsScreen(
 @Composable
 fun SettingsOnOffItemView(settingsOnOffItem: SettingsOnOffItem) {
     Card(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-        Row (modifier = Modifier.padding(16.dp)) {
+        Row(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))) {
             Column {
                 Text(text = settingsOnOffItem.title)
                 Text(text = settingsOnOffItem.description)

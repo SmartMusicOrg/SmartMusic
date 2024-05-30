@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_extra_extra_small">1dp</dimen>
+    <dimen name="padding_extra_small">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+
+    <dimen name="elevation_small">2dp</dimen>
+    <dimen name="elevation_medium">4dp</dimen>
+    <dimen name="elevation_large">8dp</dimen>
+
+    <dimen name="border_width_small">1dp</dimen>
+    <dimen name="border_width_medium">2dp</dimen>
+    <dimen name="border_width_large">4dp</dimen>
+
+    <dimen name="height_extra_small">8dp</dimen>
+    <dimen name="height_small">16dp</dimen>
+    <dimen name="height_medium">32dp</dimen>
+    <dimen name="height_large">48dp</dimen>
+</resources>
