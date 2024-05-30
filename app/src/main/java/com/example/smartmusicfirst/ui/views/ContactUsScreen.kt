@@ -1,6 +1,5 @@
 package com.example.smartmusicfirst.ui.views
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -67,16 +66,7 @@ fun ContactUsScreen(
             singleLine = false,
         )
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
-        Button(onClick = {
-            val i = Intent(Intent.ACTION_SEND)
-            val emailAddress = arrayOf(uiState.receivingAddress)
-            i.putExtra(Intent.EXTRA_EMAIL, emailAddress)
-            i.putExtra(Intent.EXTRA_SUBJECT, uiState.emailSubject)
-            i.putExtra(Intent.EXTRA_TEXT, uiState.emailBody)
-            i.setType("message/rfc822")
-            ctx.startActivity(Intent.createChooser(i, "Choose an Email client : "))
-
-        }) {
+        Button(onClick = { contactUsViewModel.sendButtonClicked(ctx) }){
             Text(
                 text = stringResource(id = R.string.send_email),
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_small)),
