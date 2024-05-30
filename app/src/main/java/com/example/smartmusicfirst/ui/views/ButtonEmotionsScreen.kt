@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -47,7 +49,7 @@ fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.outline,
+            color = Color.Black,
             modifier = Modifier.padding(1.dp)
         )
     }
@@ -61,12 +63,12 @@ fun MySimpleAppContainer(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        SimpleButton("Happy", color = Color.Green)
-        SimpleButton("Excited", color = Color(0xFFFFD151))
-        SimpleButton("Angry", color = Color.Red)
-        SimpleButton("Optimistic", color = Color.Blue)
-        SimpleButton("Sad", color = Color.DarkGray)
-        SimpleButton("Energized", color = Color.Cyan)
+        SimpleButton("Happy", color = Color(0xCF6D997C))
+        SimpleButton("Excited", color = Color(0xCFCCB874))
+        SimpleButton("Angry", color = Color(0xCFCC7474))
+        SimpleButton("Optimistic", color = Color(0xCF748DCC))
+        SimpleButton("Sad", color = Color(0xCF969696))
+        SimpleButton("Energized", color = Color(0xCF74C6CC))
     }
 }
 
