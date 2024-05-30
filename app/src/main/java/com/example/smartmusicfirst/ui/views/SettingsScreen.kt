@@ -26,7 +26,6 @@ import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 @Composable
 fun SettingsScreen(
     settingsItemOnOffList: List<SettingsOnOffItem>,
-    message: String,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -80,7 +79,6 @@ fun SettingsScreenPreview() {
                 SettingsOnOffItem("Item 9", true, "Description 9"),
                 SettingsOnOffItem("Item 10", false, "Description 10")
             ),
-            message = "Some example of message Lorem Ipsum Dolor sit ...",
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -103,7 +101,6 @@ fun SettingsScreenDarkPreview() {
                 SettingsOnOffItem("Item 9", true, "Description 9"),
                 SettingsOnOffItem("Item 10", false, "Description 10")
             ),
-            message = "Some example of message Lorem Ipsum Dolor sit ...",
             modifier = Modifier.fillMaxSize()
         )
     }
