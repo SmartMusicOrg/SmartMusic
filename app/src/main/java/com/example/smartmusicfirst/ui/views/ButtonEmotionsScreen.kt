@@ -1,6 +1,5 @@
 package com.example.smartmusicfirst.ui.views
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,26 +19,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
-import com.example.smartmusicfirst.TAG
-import com.example.smartmusicfirst.accessToken
-import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
-import com.example.smartmusicfirst.playPlaylist
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
+import com.example.smartmusicfirst.viewModels.ButtonEmotionViewModel
 
 
 @Composable
-fun SimpleButton(text: String, color: Color, modifier: Modifier = Modifier) {
+fun SimpleButton(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+    buttonEmotionViewModel: ButtonEmotionViewModel = viewModel()
+) {
     OutlinedButton(
-        onClick = {
-            SpotifyWebApi.searchForPlaylist("$text mood", accessToken) { playlistId ->
-                if (playlistId.isNotEmpty()) {
-                    playPlaylist(playlistId)
-                } else {
-                    Log.e(TAG, "No playlist found")
-                }
-            }
-        },
+        onClick = { buttonEmotionViewModel.onEmotionButtonClicked(text) },
         border = ButtonDefaults.outlinedButtonBorder.copy(width = dimensionResource(id = R.dimen.border_width_medium)),
         elevation = ButtonDefaults.elevatedButtonElevation(dimensionResource(id = R.dimen.elevation_large)),
         colors = ButtonDefaults.buttonColors(containerColor = color),
