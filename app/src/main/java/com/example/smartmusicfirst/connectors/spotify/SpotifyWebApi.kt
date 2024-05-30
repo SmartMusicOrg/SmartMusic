@@ -22,17 +22,17 @@ object SpotifyWebApi {
         callback: (String) -> Unit
     ) {
         val encodedPlaylistName = URLEncoder.encode(playlistName, "UTF-8")
-        val url = "https://api.spotify.com/v1/search?q=$encodedPlaylistName&type=playlist&limit=1"
-
+        val url = "https://api.spotify.com/v1/search?q=$encodedPlaylistName&type=playlist&limit=3"
+        val randomIndex = (0..2).random()
         val request = object : JsonObjectRequest(Method.GET, url, null,
             Response.Listener { response ->
                 // Handle successful response
-                val playlistId = response.getJSONObject("playlists")
+                val playlistUri = response.getJSONObject("playlists")
                     .getJSONArray("items")
                     .takeIf { it.length() > 0 }
-                    ?.getJSONObject(0)
-                    ?.getString("id") ?: ""
-                callback(playlistId)
+                    ?.getJSONObject(randomIndex)
+                    ?.getString("uri") ?: ""
+                callback(playlistUri)
             },
             Response.ErrorListener { error ->
                 Log.e(TAG, "Error fetching playlist: ${error.message}", error)

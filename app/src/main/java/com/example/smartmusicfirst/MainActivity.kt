@@ -84,10 +84,9 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
     }
 }
 
-fun playPlaylist(playlistId: String) {
+fun playPlaylist(playlistURI: String) {
     // Play a playlist
-    Log.d(TAG, "Playing playlist with ID: $playlistId")
-    val playlistURI = "spotify:playlist:$playlistId"
+//    val playlistURI = "spotify:playlist:$playlistId"
     SpotifyConnection.getPlayerApi()?.play(playlistURI)
     // Subscribe to PlayerState if needed
 }
