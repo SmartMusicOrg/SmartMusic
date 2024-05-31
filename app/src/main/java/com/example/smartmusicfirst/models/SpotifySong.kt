@@ -7,4 +7,5 @@ data class SpotifySong(
     val album: String? = null,
     val imageUrl: String? = null,
     val popularity: Int? = null,
+    var selected: Boolean = false
 )

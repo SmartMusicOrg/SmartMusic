@@ -80,7 +80,9 @@ fun SpotifySongItemView(spotifySong: SpotifySong) {
         supportingContent = {
             Text(text = spotifySong.artistsUri?.joinToString(", ") ?: "")
         },
-        tonalElevation = dimensionResource(id = R.dimen.elevation_small),
+        tonalElevation = if (spotifySong.selected) dimensionResource(id = R.dimen.height_extra_large) else dimensionResource(
+            id = R.dimen.elevation_small
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { playSong(spotifySong.uri) }
@@ -99,7 +101,9 @@ fun PlayerControllerView() {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             ButtonControllerView(icon = R.drawable.skip_previous) {/*TODO: skip previous*/ }
             ButtonControllerView(icon = R.drawable.play) {/*TODO: play/pause*/ }
@@ -151,7 +155,8 @@ fun PlayerPageScreenPreview() {
                     name = "Happy Mood",
                     artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
                     album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c"
+                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c",
+                    selected = true
                 ),
                 SpotifySong(
                     uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
@@ -180,7 +185,7 @@ fun PlayerPageScreenPreview() {
                     artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
                     album = "Happy Mood",
                     imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),                SpotifySong(
+                ), SpotifySong(
                     uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
                     name = "Good Mood - Original Song From Paw Patrol: The Movie",
                     artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
@@ -200,7 +205,7 @@ fun PlayerPageScreenPreview() {
                     artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
                     album = "Happy Mood",
                     imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),                SpotifySong(
+                ), SpotifySong(
                     uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
                     name = "Good Mood - Original Song From Paw Patrol: The Movie",
                     artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
@@ -245,7 +250,8 @@ fun PlayerPageScreenDarkPreview() {
                     name = "Happy Mood",
                     artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
                     album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c"
+                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c",
+                    selected = true
                 ),
                 SpotifySong(
                     uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
