@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.models.SettingsOnOffItem
@@ -46,8 +47,10 @@ fun SettingsOnOffItemView(settingsOnOffItem: SettingsOnOffItem) {
     Card(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))) {
             Column {
-                Text(text = settingsOnOffItem.title)
-                Text(text = settingsOnOffItem.description)
+                Text(text = stringResource(id = settingsOnOffItem.title))
+                if (settingsOnOffItem.description != null) {
+                    Text(text = stringResource(id = settingsOnOffItem.description))
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
             Switch(
@@ -69,16 +72,56 @@ fun SettingsScreenPreview() {
     SmartMusicFirstTheme {
         SettingsScreen(
             settingsItemOnOffList = listOf(
-                SettingsOnOffItem("Item 1", true, "Description 1"),
-                SettingsOnOffItem("Item 2", false, "Description 2"),
-                SettingsOnOffItem("Item 3", true, "Description 3"),
-                SettingsOnOffItem("Item 4", false, "Description 4"),
-                SettingsOnOffItem("Item 5", true, "Description 5"),
-                SettingsOnOffItem("Item 6", false, "Description 6"),
-                SettingsOnOffItem("Item 7", true, "Description 7"),
-                SettingsOnOffItem("Item 8", false, "Description 8"),
-                SettingsOnOffItem("Item 9", true, "Description 9"),
-                SettingsOnOffItem("Item 10", false, "Description 10")
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                )
             ),
             modifier = Modifier.fillMaxSize()
         )
@@ -91,16 +134,56 @@ fun SettingsScreenDarkPreview() {
     SmartMusicFirstTheme(darkTheme = true) {
         SettingsScreen(
             settingsItemOnOffList = listOf(
-                SettingsOnOffItem("Item 1", true, "Description 1"),
-                SettingsOnOffItem("Item 2", false, "Description 2"),
-                SettingsOnOffItem("Item 3", true, "Description 3"),
-                SettingsOnOffItem("Item 4", false, "Description 4"),
-                SettingsOnOffItem("Item 5", true, "Description 5"),
-                SettingsOnOffItem("Item 6", false, "Description 6"),
-                SettingsOnOffItem("Item 7", true, "Description 7"),
-                SettingsOnOffItem("Item 8", false, "Description 8"),
-                SettingsOnOffItem("Item 9", true, "Description 9"),
-                SettingsOnOffItem("Item 10", false, "Description 10")
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    true,
+                    R.string.setting_description_example
+                ),
+                SettingsOnOffItem(
+                    R.string.setting_title_example,
+                    false,
+                    R.string.setting_description_example
+                )
             ),
             modifier = Modifier.fillMaxSize()
         )

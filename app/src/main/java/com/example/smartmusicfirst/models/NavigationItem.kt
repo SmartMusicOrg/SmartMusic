@@ -1,5 +1,6 @@
 package com.example.smartmusicfirst.models
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
@@ -18,7 +19,7 @@ import com.example.smartmusicfirst.data.Routs
 data class NavigationItem(
     val route: String,
     @StringRes val title: Int,
-    val selectedIcon: ImageVector,
+    @DrawableRes val icon: Int,
     val hasNew: Boolean,
     val badgeCount: Int? = null,
     @StringRes val iconTitle: Int? = null

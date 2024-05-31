@@ -14,28 +14,28 @@ object LocalDataSource {
             NavigationItem(
                 route = Routs.HomePage.name,
                 title = Routs.HomePage.title,
-                selectedIcon = Icons.Filled.Home,
+                icon = R.drawable.home_icon,
                 hasNew = false,
                 iconTitle = R.string.homePage_title_icon
             ),
             NavigationItem(
                 route = Routs.Notifications.name,
                 title = Routs.Notifications.title,
-                selectedIcon = Icons.Filled.Notifications,
+                icon = R.drawable.notifications_icon,
                 hasNew = false,
                 iconTitle = R.string.NotificationsPage_title_icon
             ),
             NavigationItem(
                 route = Routs.Settings.name,
                 title = Routs.Settings.title,
-                selectedIcon = Icons.Filled.Settings,
+                icon = R.drawable.settings_icon,
                 hasNew = false,
                 iconTitle = R.string.SettingsPage_title_icon
             ),
             NavigationItem(
                 route = Routs.ContactUs.name,
                 title = Routs.ContactUs.title,
-                selectedIcon = Icons.Filled.Email,
+                icon = R.drawable.mail_icon,
                 hasNew = false,
                 iconTitle = R.string.ContactUsPage_title_icon
             )
