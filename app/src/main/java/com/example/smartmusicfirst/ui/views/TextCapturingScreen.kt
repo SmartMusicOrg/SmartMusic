@@ -1,64 +1,130 @@
 package com.example.smartmusicfirst.ui.views
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 
 @Composable
-fun TextCapturingScreen(title: String, message: String, modifier: Modifier = Modifier) {
+fun SongSearchScreen(modifier: Modifier = Modifier) {
+    val searchText = remember { mutableStateOf("") }
+
     Column(
-        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
+            .padding(horizontal = 24.dp, vertical = 32.dp) // Increased padding for better spacing
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
+        verticalArrangement = Arrangement.Top
     ) {
         Text(
-            text = title,
+            text = "Search for a song",
             style = MaterialTheme.typography.titleLarge,
-            color =MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(16.dp)
+            fontSize = 32.sp,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 32.dp) // Added bottom padding for spacing
         )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color =MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(16.dp)
-        )
+
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = 16.dp) // Added bottom padding for spacing
+        ) {
+            IconButton(
+                onClick = {
+                    // Implement microphone functionality here
+                    Log.d(TAG, "Microphone icon clicked")
+                },
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Microphone",
+                    tint = Color.White
+                )
+            }
+            TextField(
+                value = searchText.value,
+                onValueChange = { searchText.value = it },
+                label = { Text("Express your feelings right now") },
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(end = 8.dp) // Added padding for better spacing
+            )
+        }
+
+        Button(
+            onClick = {
+//todo                // Search for the song using the searchText.value
+//                SpotifyWebApi.searchForPlaylist(searchText.value, accessToken) { playlistId ->
+//                    if (playlistId.isNotEmpty()) {
+//                        playPlaylist(playlistId)
+//                    } else {
+//                        Log.e(TAG, "No song found")
+//                    }
+//                }
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .height(56.dp), // Fixed height for consistency
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+            Text(
+                text = "Search",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
+            )
+        }
     }
 }
 
 @Preview
 @Composable
-fun TextCapturingScreenPreview() {
+fun SongSearchScreenPreview() {
     SmartMusicFirstTheme {
-        TextCapturingScreen(
-            title = "Example Title",
-            message = "Some example of message Lorem Ipsum Dolor sit ...",
-            modifier = Modifier.fillMaxSize()
-        )
+        SongSearchScreen()
     }
 }
 
 @Preview
 @Composable
-fun TextCapturingScreenkPreview() {
+fun SongSearchScreenDarkPreview() {
     SmartMusicFirstTheme(darkTheme = true) {
-        TextCapturingScreen(
-            title = "Example Title",
-            message = "Some example of message Lorem Ipsum Dolor sit ...",
-            modifier = Modifier.fillMaxSize()
-        )
+        SongSearchScreen()
     }
 }
