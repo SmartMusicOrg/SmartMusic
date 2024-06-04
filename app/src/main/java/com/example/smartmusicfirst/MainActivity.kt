@@ -1,6 +1,5 @@
 package com.example.smartmusicfirst
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -23,9 +22,10 @@ var accessToken: String = ""
 
 class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuthConnectionListener {
 
-    private val spotifyAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        SpotifyAuthConnection.onActivityResult(result.resultCode, result.data)
-    }
+    private val spotifyAuthLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            SpotifyAuthConnection.onActivityResult(result.resultCode, result.data)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +85,6 @@ fun playPlaylist(playlistURI: String) {
     SpotifyConnection.getPlayerApi()?.play(playlistURI)
 }
 
-fun playSong(songUri: String){
+fun playSong(songUri: String) {
     SpotifyConnection.getPlayerApi()?.play(songUri)
 }
