@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +22,11 @@ const val TAG = "MainActivity"
 var accessToken: String = ""
 
 class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuthConnectionListener {
+
+    private val spotifyAuthLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        SpotifyAuthConnection.onActivityResult(result.resultCode, result.data)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,17 +41,15 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
                 )
             }
         }
-        SpotifyAuthConnection.initAuthConnection(this, this)
+        SpotifyAuthConnection.initAuthConnection(this, this, spotifyAuthLauncher)
         // Initialize SpotifyWebApi with the application context
         SpotifyWebApi.init(applicationContext)
     }
 
     override fun onSpotifyConnected() {
         Log.d(TAG, "Spotify connected")
-//        connected()
     }
 
-    // TODO to remove the onStart:
     override fun onStart() {
         super.onStart()
         Log.d(TAG, accessToken)
@@ -75,20 +79,10 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuth
     override fun onSpotifyAuthFailure(error: Throwable) {
         Log.e(TAG, "Spotify authentication failed: ${error.message}", error)
     }
-
-    // TODO change the onActivityResult to better handle the SpotifyAuthConnection
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        SpotifyAuthConnection.onActivityResult(requestCode, resultCode, data)
-    }
 }
 
 fun playPlaylist(playlistURI: String) {
-    // Play a playlist
-//    val playlistURI = "spotify:playlist:$playlistId"
     SpotifyConnection.getPlayerApi()?.play(playlistURI)
-    // Subscribe to PlayerState if needed
 }
 
 fun playSong(songUri: String){
