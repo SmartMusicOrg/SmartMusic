@@ -15,18 +15,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartMusicFirst"
         tools:targetApi="31">
-
-
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true">
-
-        </activity>
         <activity
             android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SmartMusicFirst"/>
+        <activity
+            android:name=".LogInActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.SmartMusicFirst">
+            android:label="@string/title_activity_log_in"
+            android:theme="@style/Theme.SmartMusicFirst" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

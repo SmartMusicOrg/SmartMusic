@@ -8,6 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.example.smartmusicfirst"
         minSdk = 24
         targetSdk = 34

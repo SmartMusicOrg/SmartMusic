@@ -27,5 +27,6 @@
     <string name="ContactUsPage_title_icon">Mail</string>
 
     <string name="PlaceHolderPage_title">Oops!</string>
+    <string name="title_activity_log_in">LogInActivity</string>
 
 </resources>
