@@ -19,4 +19,6 @@
     <dimen name="height_medium">32dp</dimen>
     <dimen name="height_large">48dp</dimen>
     <dimen name="height_extra_large">64dp</dimen>
+
+    <dimen name="image_size_large">100dp</dimen>
 </resources>
