@@ -24,27 +24,37 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
+import com.example.smartmusicfirst.viewModels.TextCapturingViewModel
 
 @Composable
-fun SongSearchScreen(modifier: Modifier = Modifier) {
-    val searchText = remember { mutableStateOf("") }
+fun TextCapturingScreen(
+    modifier: Modifier = Modifier,
+    textCapturingViewModel: TextCapturingViewModel = viewModel()
+) {
+    val uiState by textCapturingViewModel.uiState.collectAsState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 32.dp) // Increased padding for better spacing
+            .padding(
+                horizontal = dimensionResource(id = R.dimen.padding_medium),
+                vertical = dimensionResource(id = R.dimen.padding_large)
+            )
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -79,12 +89,12 @@ fun SongSearchScreen(modifier: Modifier = Modifier) {
                 )
             }
             TextField(
-                value = searchText.value,
-                onValueChange = { searchText.value = it },
-                label = { Text("Express your feelings right now") },
+                value = uiState.inputString,
+                onValueChange = { textCapturingViewModel.updateInputString(it) },
+                placeholder = { Text("Express your feelings right now") },
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(end = 8.dp) // Added padding for better spacing
+                    .padding(end = dimensionResource(id = R.dimen.padding_small)) // Added padding for better spacing
             )
         }
 
@@ -117,7 +127,7 @@ fun SongSearchScreen(modifier: Modifier = Modifier) {
 @Composable
 fun SongSearchScreenPreview() {
     SmartMusicFirstTheme {
-        SongSearchScreen()
+        TextCapturingScreen()
     }
 }
 
@@ -125,6 +135,6 @@ fun SongSearchScreenPreview() {
 @Composable
 fun SongSearchScreenDarkPreview() {
     SmartMusicFirstTheme(darkTheme = true) {
-        SongSearchScreen()
+        TextCapturingScreen()
     }
 }
