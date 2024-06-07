@@ -64,13 +64,13 @@ fun TextCapturingScreen(
             style = MaterialTheme.typography.titleLarge,
             fontSize = 32.sp,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 32.dp) // Added bottom padding for spacing
+            modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         )
 
         Row(
             modifier = Modifier
                 .weight(1f)
-                .padding(bottom = 16.dp) // Added bottom padding for spacing
+                .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         ) {
             IconButton(
                 onClick = {
@@ -78,7 +78,7 @@ fun TextCapturingScreen(
                     Log.d(TAG, "Microphone icon clicked")
                 },
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(dimensionResource(id = R.dimen.height_large))
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary, CircleShape)
             ) {
@@ -111,8 +111,7 @@ fun TextCapturingScreen(
             },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .height(56.dp), // Fixed height for consistency
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                .height(dimensionResource(id = R.dimen.height_large)),
         ) {
             Text(
                 text = "Search",

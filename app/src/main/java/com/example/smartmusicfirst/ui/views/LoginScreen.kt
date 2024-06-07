@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -44,7 +45,14 @@ fun LogInScreen(onLoginClick: () -> Unit, errorMessage: String? = null) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
+                    .background(
+                        brush = Brush.verticalGradient(
+                            listOf(
+                                Color.Black.copy(alpha = 0.8f),
+                                Color.Black.copy(alpha = 0.2f)
+                            )
+                        )
+                    )
             )
 
             Column(
@@ -71,7 +79,7 @@ fun LogInScreen(onLoginClick: () -> Unit, errorMessage: String? = null) {
                 Button(
                     onClick = onLoginClick,
                     colors = ButtonDefaults.buttonColors(
-                        Color(0xFF795548), // Brown color
+                        Color(0xFF1DB954), // Green Spotify's Color
                         contentColor = Color.White
                     )
                 ) {
@@ -108,3 +116,4 @@ fun LogInScreen(onLoginClick: () -> Unit, errorMessage: String? = null) {
 fun LogInScreenPreview() {
     LogInScreen(onLoginClick = {})
 }
+

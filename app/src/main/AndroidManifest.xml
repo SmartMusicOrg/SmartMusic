@@ -23,7 +23,8 @@
             android:name=".LogInActivity"
             android:exported="true"
             android:label="@string/title_activity_log_in"
-            android:theme="@style/Theme.SmartMusicFirst" >
+            android:theme="@style/Theme.SmartMusicFirst"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
