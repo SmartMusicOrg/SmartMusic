@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
+import com.example.smartmusicfirst.models.KeywordCroticalio
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,8 @@ class TextCapturingViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(inputString = str)
     }
 
-    fun getKeyword(accessToken: String = "") {
+    fun getKeyword(accessToken: String = ""): List<KeywordCroticalio> {
+        val res = mutableListOf<KeywordCroticalio>()
         try {
             Log.d(TAG, "Access token: $accessToken")
             CroticalioApi.findKeyWords(
@@ -28,11 +30,13 @@ class TextCapturingViewModel : ViewModel() {
                     keywords.forEach {
                         Log.d(TAG, it.toString())
                     }
+                    res.addAll(keywords)
                 }
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error: ${e.message}")
         }
+        return res
     }
 
 }

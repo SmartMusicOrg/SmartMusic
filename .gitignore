@@ -21,3 +21,4 @@ local.properties
 /.idea/copilot/chatSessions/blobs/version
 /.idea/copilot/chatSessions/xd.lck
 /app/src/main/res/raw/corticalio.properties
+/app/src/main/res/raw/chat_gpt.properties
