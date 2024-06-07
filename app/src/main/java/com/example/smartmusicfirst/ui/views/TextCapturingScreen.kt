@@ -17,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,15 +29,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 import com.example.smartmusicfirst.viewModels.TextCapturingViewModel
+import java.util.Properties
 
 @Composable
 fun TextCapturingScreen(
@@ -46,7 +46,7 @@ fun TextCapturingScreen(
     textCapturingViewModel: TextCapturingViewModel = viewModel()
 ) {
     val uiState by textCapturingViewModel.uiState.collectAsState()
-
+    val context = LocalContext.current
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -100,6 +100,11 @@ fun TextCapturingScreen(
 
         Button(
             onClick = {
+                val inputStream = context.resources.openRawResource(R.raw.corticalio)
+                val properties = Properties()
+                properties.load(inputStream)
+                val corticalioAccessToken = properties.getProperty("croticalio_access_token") ?: ""
+                textCapturingViewModel.getKeyword(corticalioAccessToken)
 //todo                // Search for the song using the searchText.value
 //                SpotifyWebApi.searchForPlaylist(searchText.value, accessToken) { playlistId ->
 //                    if (playlistId.isNotEmpty()) {

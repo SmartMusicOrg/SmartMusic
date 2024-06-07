@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, accessToken)
+//        Log.d(TAG, accessToken)
         if (!SpotifyConnection.isConnected()) {
             SpotifyConnection.connect(this, LogInActivity())
         }
