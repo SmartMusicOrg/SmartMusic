@@ -100,11 +100,11 @@ fun TextCapturingScreen(
 
         Button(
             onClick = {
-                val inputStream = context.resources.openRawResource(R.raw.corticalio)
-                val properties = Properties()
-                properties.load(inputStream)
+                val properties = Properties().apply { load(context.resources.openRawResource(R.raw.corticalio)) }
                 val corticalioAccessToken = properties.getProperty("croticalio_access_token") ?: ""
-                textCapturingViewModel.getKeyword(corticalioAccessToken)
+                properties.load(context.resources.openRawResource(R.raw.gemini))
+                val geminiApiKey = properties.getProperty("gemini_api_key") ?: ""
+                textCapturingViewModel.searchSong(corticalioAccessToken, geminiApiKey)
 //todo                // Search for the song using the searchText.value
 //                SpotifyWebApi.searchForPlaylist(searchText.value, accessToken) { playlistId ->
 //                    if (playlistId.isNotEmpty()) {
