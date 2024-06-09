@@ -52,12 +52,11 @@ class TextCapturingViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = GeminiApi.getGeminiResponse(inputQuery, apiKey)
-//                deferred.complete(response)
+                deferred.complete(response)
             } catch (e: Exception) {
                 deferred.completeExceptionally(e)
             }
         }
-
         return deferred
     }
 
