@@ -74,7 +74,7 @@ fun TextCapturingScreen(
         ) {
             IconButton(
                 onClick = {
-                    // Implement microphone functionality here
+                    textCapturingViewModel.speechToText(context)
                     Log.d(TAG, "Microphone icon clicked")
                 },
                 modifier = Modifier
@@ -105,14 +105,6 @@ fun TextCapturingScreen(
                 properties.load(context.resources.openRawResource(R.raw.gemini))
                 val geminiApiKey = properties.getProperty("gemini_api_key") ?: ""
                 textCapturingViewModel.searchSong(corticalioAccessToken, geminiApiKey)
-//todo                // Search for the song using the searchText.value
-//                SpotifyWebApi.searchForPlaylist(searchText.value, accessToken) { playlistId ->
-//                    if (playlistId.isNotEmpty()) {
-//                        playPlaylist(playlistId)
-//                    } else {
-//                        Log.e(TAG, "No song found")
-//                    }
-//                }
             },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
