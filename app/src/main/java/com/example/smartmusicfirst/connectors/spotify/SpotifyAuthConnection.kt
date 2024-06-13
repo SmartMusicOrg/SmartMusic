@@ -15,6 +15,7 @@ interface SpotifyAuthConnectionListener {
     fun onSpotifyAuthSuccess(accessToken: String)
     fun onSpotifyAuthFailure(error: Throwable)
 }
+
 /**
  * Singleton object responsible for managing the authentication to Spotify.
  */
@@ -32,7 +33,11 @@ object SpotifyAuthConnection {
      * @param listener The listener to be added to the list of SpotifyAuthConnectionListeners.
      * @param launcher The launcher used to start the authentication activity.
      */
-    fun initAuthConnection(activity: Activity, listener: SpotifyAuthConnectionListener, launcher: ActivityResultLauncher<Intent>) {
+    fun initAuthConnection(
+        activity: Activity,
+        listener: SpotifyAuthConnectionListener,
+        launcher: ActivityResultLauncher<Intent>
+    ) {
         spotifyAuthConnectionListener = listener
         val properties = Properties()
         try {
@@ -49,12 +54,13 @@ object SpotifyAuthConnection {
             AuthorizationResponse.Type.TOKEN,
             redirectUri
         )
-            .setScopes(arrayOf("user-read-email", "user-library-read"))
+            .setScopes(arrayOf("playlist-modify-public","playlist-modify-private","user-read-private", "user-read-email", "user-library-read"))
             .setCustomParam("show_dialog", "true")
             .build()
 
         launcher.launch(AuthorizationClient.createLoginActivityIntent(activity, request))
     }
+
     /**
      * Handles the result of the authentication request.
      *
@@ -67,9 +73,11 @@ object SpotifyAuthConnection {
             AuthorizationResponse.Type.TOKEN -> {
                 spotifyAuthConnectionListener?.onSpotifyAuthSuccess(response.accessToken)
             }
+
             AuthorizationResponse.Type.ERROR -> {
                 spotifyAuthConnectionListener?.onSpotifyAuthFailure(Throwable(response.error))
             }
+
             else -> {
                 spotifyAuthConnectionListener?.onSpotifyAuthFailure(Throwable("Invalid response type"))
             }

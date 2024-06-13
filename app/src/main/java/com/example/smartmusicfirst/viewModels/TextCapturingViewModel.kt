@@ -12,6 +12,7 @@ import com.example.smartmusicfirst.models.KeywordCroticalio
 import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.models.SpotifyUser
+import com.example.smartmusicfirst.playPlaylist
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -31,26 +32,41 @@ class TextCapturingViewModel : ViewModel() {
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
         viewModelScope.launch {
             try {
-                // take the key words
+                // Take the keywords
                 val keywords = getKeywordDeferred(corticalioAccessToken).await()
 
-                // give gemini the key words and extract relevant songs
+                // Filter the keywords and get current user preferences
+
+                // Give Gemini the keywords and extract relevant songs
                 val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
 
-                // clean the response of gemini
+                // Clean the response of Gemini
                 val songs = getSongsNamesFromGeminiResponse(response)
-                Log.d(TAG, "Gemini Response: $songs")
+                Log.d(TAG, "Songs: $songs")
 
-                // get the songs from spotify
+                // Get the songs from Spotify
                 val songsList = getSongsList(songs).await()
-                Log.d(TAG, "Songs List: $songsList")
 
+                // Get the current user
+                val user = getCurrentUser().await()
 
+                // Create a playlist that will contain all the songs
+                val playlist = createPlaylist(user.id).await()
+
+                // Add the songs to the playlist
+                val songUris = songsList.map { it.uri }
+
+                addSongsToPlaylist(playlist.id, songUris)
+
+                // Play the playlist
+                playPlaylist(playlist.uri)
+                //me and my girlfriend having fun together
             } catch (e: Exception) {
                 Log.e(TAG, "Error during API calls", e)
             }
         }
     }
+
 
     private fun getKeywordDeferred(accessToken: String): CompletableDeferred<List<KeywordCroticalio>> {
         val deferred = CompletableDeferred<List<KeywordCroticalio>>()
@@ -136,24 +152,38 @@ class TextCapturingViewModel : ViewModel() {
     }
 
     private fun getCurrentUser(): CompletableDeferred<SpotifyUser> {
-        if (SpotifyWebApi.currentUser != null) {
-            return CompletableDeferred(SpotifyWebApi.currentUser!!)
-        }
         val deferred = CompletableDeferred<SpotifyUser>()
+        if (SpotifyWebApi.currentUser != null) {
+            SpotifyWebApi.getCurrentUserDetails { user ->
+                deferred.complete(user)
+            }
+            return deferred
+        }
         SpotifyWebApi.getCurrentUserDetails { user ->
             deferred.complete(user)
         }
         return deferred
     }
 
-    private fun createPlaylist(): CompletableDeferred<SpotifyPlaylist> {
+    private fun createPlaylist(userId: String): CompletableDeferred<SpotifyPlaylist> {
         val deferred = CompletableDeferred<SpotifyPlaylist>()
         val playlistName = "Smart Music First Playlist"
-        val userId = "finalprojectmanager"
         SpotifyWebApi.createPlaylist(userId, playlistName) { playlist ->
-            deferred.complete(playlist)
+            if (playlist != null) {
+                deferred.complete(playlist)
+            }
         }
         return deferred
+    }
+
+    private fun addSongsToPlaylist(playlistId: String, songUris: List<String>) {
+        viewModelScope.launch {
+            try {
+                SpotifyWebApi.addItemsToExistingPlaylist(playlistId, songUris)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error adding songs to playlist", e)
+            }
+        }
     }
 
 

@@ -11,6 +11,8 @@ import com.example.smartmusicfirst.models.SpotifyArtist
 import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.models.SpotifyUser
+import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.net.URLEncoder
 
@@ -18,7 +20,7 @@ object SpotifyWebApi {
     private lateinit var applicationContext: Context
 
     var accessToken: String = ""
-    var currentUser:SpotifyUser? = null
+    var currentUser: SpotifyUser? = null
 
     fun init(context: Context, accessToken: String) {
         applicationContext = context.applicationContext
@@ -171,8 +173,7 @@ object SpotifyWebApi {
         Volley.newRequestQueue(applicationContext).add(request)
     }
 
-
-    fun createPlaylist(userId: String, playlistName: String, callback: (SpotifyPlaylist) -> Unit) {
+    fun createPlaylist(userId: String, playlistName: String, callback: (SpotifyPlaylist?) -> Unit) {
         val url = "https://api.spotify.com/v1/users/$userId/playlists"
         val body = JSONObject().apply {
             put("name", playlistName)
@@ -184,16 +185,52 @@ object SpotifyWebApi {
             url,
             body,
             Response.Listener { response ->
-                val playlist = SpotifyPlaylist(
-                    uri = response.getString("uri"),
-                    name = response.getString("name"),
-                    imageUrl = response.getJSONArray("images").getJSONObject(0).getString("url")
-                )
-                Log.d(DEBUG_TAG, "Playlist: $playlist")
-                callback(playlist)
+                try {
+                    val playlist = SpotifyPlaylist(
+                        uri = response.getString("uri"),
+                        name = response.getString("name"),
+                        imageUrl = response.optJSONArray("images")?.optJSONObject(0)
+                            ?.optString("url", ""),
+                        id = response.getString("id")
+                    )
+                    Log.d(DEBUG_TAG, "Playlist: $playlist")
+                    callback(playlist)
+                } catch (e: JSONException) {
+                    Log.e(TAG, "Error parsing playlist response: ${e.message}", e)
+                    callback(null)
+                }
             },
             Response.ErrorListener { error ->
                 Log.e(TAG, "Error creating playlist: ${error.message}", error)
+                callback(null)
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer $accessToken"
+                headers["Content-Type"] = "application/json"
+                return headers
+            }
+        }
+
+        // Add the request to the request queue
+        Volley.newRequestQueue(applicationContext).add(request)
+    }
+
+
+    fun addItemsToExistingPlaylist(playlistId: String, songUris: List<String>) {
+        val url = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
+        val body = JSONObject().apply {
+            put("uris", JSONArray(songUris))
+        }
+        val request = object : JsonObjectRequest(
+            Method.POST,
+            url,
+            body,
+            Response.Listener { response ->
+                Log.d(DEBUG_TAG, "Items added to playlist: $response")
+            },
+            Response.ErrorListener { error ->
+                Log.e(TAG, "Error adding items to playlist: ${error.message}", error)
             }) {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
