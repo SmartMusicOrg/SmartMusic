@@ -18,6 +18,7 @@ object SpotifyWebApi {
     private lateinit var applicationContext: Context
 
     var accessToken: String = ""
+    var currentUser:SpotifyUser? = null
 
     fun init(context: Context, accessToken: String) {
         applicationContext = context.applicationContext
@@ -114,6 +115,7 @@ object SpotifyWebApi {
                     product = response.getString("product")
                 )
                 Log.d(DEBUG_TAG, "User: $user")
+                currentUser = user
                 callback(user)
             },
             Response.ErrorListener { error ->
