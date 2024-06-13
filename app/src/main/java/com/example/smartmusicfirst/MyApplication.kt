@@ -8,7 +8,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // Initialize the APIs with the application context
-        SpotifyWebApi.init(this)
+        SpotifyWebApi.init(this, "")
         CroticalioApi.init(this)
     }
 }

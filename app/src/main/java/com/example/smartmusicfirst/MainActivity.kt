@@ -1,7 +1,6 @@
 package com.example.smartmusicfirst
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +12,7 @@ import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
 import com.example.smartmusicfirst.ui.views.SmartMusicScreen
 
 const val TAG = "MainActivity"
-var accessToken: String = ""
+const val DEBUG_TAG = "Debug"
 
 class MainActivity : ComponentActivity() {
 
@@ -36,7 +35,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-//        Log.d(TAG, accessToken)
         if (!SpotifyConnection.isConnected()) {
             SpotifyConnection.connect(this, LogInActivity())
         }

@@ -1,4 +1,3 @@
-
 package com.example.smartmusicfirst
 
 import android.content.Intent
@@ -9,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
@@ -17,7 +15,8 @@ import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.ui.views.LogInScreen
 
-class LogInActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAuthConnectionListener {
+class LogInActivity : ComponentActivity(), SpotifyConnectionListener,
+    SpotifyAuthConnectionListener {
 
     private val spotifyAuthLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -39,7 +38,7 @@ class LogInActivity : ComponentActivity(), SpotifyConnectionListener, SpotifyAut
     }
 
     override fun onSpotifyAuthSuccess(accessToken: String) {
-        com.example.smartmusicfirst.accessToken = accessToken
+        SpotifyWebApi.accessToken = accessToken
         SpotifyConnection.connect(this, this)
         startActivity(Intent(this, MainActivity::class.java))
         finish() // Close the login activity

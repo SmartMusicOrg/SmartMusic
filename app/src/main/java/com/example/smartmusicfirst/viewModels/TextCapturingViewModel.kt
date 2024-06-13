@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
 import com.example.smartmusicfirst.connectors.gemini.GeminiApi
+import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
 import com.example.smartmusicfirst.models.KeywordCroticalio
+import com.example.smartmusicfirst.models.SpotifyPlaylist
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +22,18 @@ class TextCapturingViewModel : ViewModel() {
 
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)
+    }
+
+    fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
+        viewModelScope.launch {
+            try {
+                val keywords = getKeywordDeferred(corticalioAccessToken).await()
+                val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
+                Log.d(TAG, "Gemini Response: $response")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error during API calls", e)
+            }
+        }
     }
 
     private fun getKeywordDeferred(accessToken: String): CompletableDeferred<List<KeywordCroticalio>> {
@@ -60,15 +74,15 @@ class TextCapturingViewModel : ViewModel() {
         return deferred
     }
 
-    fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
-        viewModelScope.launch {
-            try {
-                val keywords = getKeywordDeferred(corticalioAccessToken).await()
-                val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
-                Log.d(TAG, "Gemini Response: $response")
-            } catch (e: Exception) {
-                Log.e(TAG, "Error during API calls", e)
-            }
+    private fun createPlaylist(accessToken: String): CompletableDeferred<SpotifyPlaylist> {
+        val deferred = CompletableDeferred<SpotifyPlaylist>()
+        val playlistName = "Smart Music First Playlist"
+        val userId = "finalprojectmanager"
+        SpotifyWebApi.createPlaylist(userId, playlistName) { playlist ->
+            deferred.complete(playlist)
         }
+        return deferred
     }
+
+
 }
