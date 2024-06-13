@@ -93,7 +93,7 @@ class TextCapturingViewModel : ViewModel() {
         val keywordsTemplate = listOfKeywords.joinToString(" ") { it.word }
         Log.d(TAG, "Keywords template: $keywordsTemplate")
         val inputQuery =
-            "give me list of top five popular songs that connected to the following words: $keywordsTemplate give only the list of names and don't add further information"
+            "give me list of top fifteen popular songs that connected to the following words: $keywordsTemplate give only the list without any other world accept the list"
 
         viewModelScope.launch {
             try {
