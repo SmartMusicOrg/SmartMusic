@@ -1,13 +1,6 @@
 package com.example.smartmusicfirst.viewModels
 
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.util.Log
-import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.TAG
@@ -38,6 +31,10 @@ class TextCapturingViewModel : ViewModel() {
 
     fun enableRecording(isAvaileable: Boolean) {
         _uiState.value = _uiState.value.copy(canUseRecord = isAvaileable)
+    }
+
+    fun updateListeningState(isListening: Boolean) {
+        _uiState.value = _uiState.value.copy(isListening = isListening)
     }
 
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {

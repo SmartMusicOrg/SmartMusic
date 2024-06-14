@@ -94,8 +94,10 @@ fun TextCapturingScreen(
                 .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         ) {
             IconButton(
+                enabled = uiState.canUseRecord,
                 onClick = {
                     Log.d(TAG, "Voice to text state: $voiceToTextState")
+                    textCapturingViewModel.updateListeningState(!uiState.isListening)
                     if (voiceToTextState.isListening) {
                         voiceToTextParser.stopListening()
                     } else {
@@ -105,7 +107,10 @@ fun TextCapturingScreen(
                 modifier = Modifier
                     .size(dimensionResource(id = R.dimen.height_large))
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    .background(
+                        if (uiState.isListening) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        CircleShape
+                    )
             ) {
                 Icon(
                     imageVector = Icons.Default.Star,
