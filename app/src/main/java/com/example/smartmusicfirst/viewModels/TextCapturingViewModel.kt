@@ -36,6 +36,10 @@ class TextCapturingViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(inputString = str)
     }
 
+    fun enableRecording(isAvaileable: Boolean) {
+        _uiState.value = _uiState.value.copy(canUseRecord = isAvaileable)
+    }
+
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
         viewModelScope.launch {
             try {
@@ -192,68 +196,5 @@ class TextCapturingViewModel : ViewModel() {
             }
         }
     }
-
-    fun speechToText(context: Context) {
-        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
-            Log.e(TAG, "Speech recognition is not available")
-            return
-        }
-
-        val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.current.language)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, Locale.current.language)
-            putExtra(
-                RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE,
-                Locale.current.language
-            )
-            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-        }
-
-        speechRecognizer.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(params: Bundle?) {
-                Log.d(TAG, "Ready for speech")
-            }
-
-            override fun onBeginningOfSpeech() {
-                Log.d(TAG, "Beginning of speech")
-            }
-
-            override fun onRmsChanged(rmsdB: Float) {}
-
-            override fun onBufferReceived(buffer: ByteArray?) {}
-
-            override fun onEndOfSpeech() {
-                Log.d(TAG, "End of speech")
-            }
-
-            override fun onError(error: Int) {
-                Log.e(TAG, "Error during speech recognition: $error")
-            }
-
-            override fun onResults(results: Bundle?) {
-                results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                    ?.let { resultList ->
-                        if (resultList.isNotEmpty()) {
-                            val recognizedText = resultList[0]
-                            updateInputString(recognizedText)
-                            Log.d(TAG, "Recognized text: $recognizedText")
-                        }
-                    }
-            }
-
-            override fun onPartialResults(partialResults: Bundle?) {}
-
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
-
-        speechRecognizer.startListening(intent)
-    }
-
 
 }
