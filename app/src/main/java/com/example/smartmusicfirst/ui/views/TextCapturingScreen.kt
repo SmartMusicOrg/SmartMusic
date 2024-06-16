@@ -1,7 +1,5 @@
 package com.example.smartmusicfirst.ui.views
 
-import android.app.Application
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,15 +33,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
-import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 import com.example.smartmusicfirst.viewModels.TextCapturingViewModel
-import com.example.smartmusicfirst.viewModels.VoiceToTextParser
 import java.util.Properties
 
 @Composable
@@ -53,9 +48,6 @@ fun TextCapturingScreen(
 ) {
     val uiState by textCapturingViewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val application = context.applicationContext as Application
-    val voiceToTextParser = textCapturingViewModel.voiceToTextParser
-    val voiceToTextState by voiceToTextParser.state.collectAsState()
 
     val recordAudioLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -93,14 +85,7 @@ fun TextCapturingScreen(
         ) {
             IconButton(
                 enabled = uiState.canUseRecord && uiState.recordingGranted,
-                onClick = {
-                    Log.d(TAG, "Voice to text state: $voiceToTextState")
-                    if (voiceToTextState.isListening) {
-                        voiceToTextParser.stopListening()
-                    } else {
-                        voiceToTextParser.startListening(Locale.current.language)
-                    }
-                },
+                onClick = { textCapturingViewModel.speechToTextButtonClicked() },
                 modifier = Modifier
                     .size(dimensionResource(id = R.dimen.height_large))
                     .clip(CircleShape)

@@ -1,9 +1,14 @@
 package com.example.smartmusicfirst.viewModels
 
 import android.app.Application
+import android.content.Intent
+import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.util.Log
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
@@ -23,30 +28,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class TextCapturingViewModel(application: Application) : AndroidViewModel(application) {
+class TextCapturingViewModel(application: Application) : AndroidViewModel(application),
+    RecognitionListener {
+    private val app = application
     private val _uiState = MutableStateFlow(TextCapturingUiState())
     val uiState: StateFlow<TextCapturingUiState> = _uiState.asStateFlow()
-
-    val voiceToTextParser: VoiceToTextParser = VoiceToTextParser(application, this)
+    private val recognizer = SpeechRecognizer.createSpeechRecognizer(application)
 
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)
     }
 
-    fun updateCanUseSubmit(canUseSubmit: Boolean) {
-        _uiState.value = _uiState.value.copy(canUseSubmit = canUseSubmit)
-    }
-
-    fun updateCanUseRecord(canUseRecord: Boolean) {
-        _uiState.value = _uiState.value.copy(canUseRecord = canUseRecord)
-    }
-
     fun enableRecording(isAvaileable: Boolean) {
         _uiState.value = _uiState.value.copy(recordingGranted = isAvaileable)
-    }
-
-    fun updateListeningState(isListening: Boolean) {
-        _uiState.value = _uiState.value.copy(isListening = isListening)
     }
 
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
@@ -86,7 +80,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             }
         }
     }
-
 
     private fun getKeywordDeferred(accessToken: String): CompletableDeferred<List<KeywordCroticalio>> {
         val deferred = CompletableDeferred<List<KeywordCroticalio>>()
@@ -205,5 +198,96 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             }
         }
     }
+
+    fun speechToTextButtonClicked() {
+        if (_uiState.value.isListening) {
+            stopListening()
+        } else {
+            startListening(Locale.current.language)
+        }
+    }
+
+    private fun startListening(languageCode: String = "en") {
+        _uiState.value = _uiState.value.copy(canUseRecord = true)
+
+        if (!SpeechRecognizer.isRecognitionAvailable(app)) {
+            this.updateInputString("Speech recognition is not available on this device")
+            return
+        }
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        )
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
+        recognizer.setRecognitionListener(this)
+        recognizer.startListening(intent)
+        _uiState.value =
+            _uiState.value.copy(canUseRecord = true, canUseSubmit = false, isListening = true)
+    }
+
+    private fun stopListening() {
+        recognizer.stopListening()
+        _uiState.value = _uiState.value.copy(isListening = false)
+        _uiState.value = _uiState.value.copy(canUseRecord = false)
+
+    }
+
+    override fun onReadyForSpeech(p0: Bundle?) {
+    }
+
+    override fun onEndOfSpeech() {
+        _uiState.value = _uiState.value.copy(canUseRecord = false)
+        _uiState.value = _uiState.value.copy(isListening = false)
+    }
+
+    override fun onError(errorCode: Int) {
+        val errorMessage = getErrorText(errorCode)
+        Log.e(TAG, "Error occurred: $errorMessage")
+        this.updateInputString(errorMessage)
+        if (errorCode != SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
+            _uiState.value = _uiState.value.copy(canUseRecord = true, isListening = false)
+        }
+        _uiState.value = _uiState.value.copy(canUseSubmit = true)
+    }
+
+    override fun onResults(p0: Bundle?) {
+        p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0)?.let { result ->
+            Log.d(TAG, "Result: $result")
+            this.updateInputString(result)
+            _uiState.value = _uiState.value.copy(canUseRecord = true)
+            _uiState.value = _uiState.value.copy(canUseSubmit = true)
+        }
+    }
+
+    private fun getErrorText(errorCode: Int): String {
+        return when (errorCode) {
+            SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
+            SpeechRecognizer.ERROR_CLIENT -> "Client-side error"
+            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Insufficient permissions"
+            SpeechRecognizer.ERROR_NETWORK -> "Network error"
+            SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+            SpeechRecognizer.ERROR_NO_MATCH -> "No match found"
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Waiting for recognizer to finish"
+            SpeechRecognizer.ERROR_SERVER -> "Server error"
+            SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No speech input"
+            else -> "Unknown error"
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        recognizer.destroy()
+    }
+
+    override fun onBeginningOfSpeech() = Unit
+
+    override fun onRmsChanged(p0: Float) = Unit
+
+    override fun onBufferReceived(p0: ByteArray?) = Unit
+
+    override fun onPartialResults(p0: Bundle?) = Unit
+
+    override fun onEvent(p0: Int, p1: Bundle?) = Unit
 
 }
