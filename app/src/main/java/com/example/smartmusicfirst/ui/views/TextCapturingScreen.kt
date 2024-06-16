@@ -54,9 +54,7 @@ fun TextCapturingScreen(
     val uiState by textCapturingViewModel.uiState.collectAsState()
     val context = LocalContext.current
     val application = context.applicationContext as Application
-    val voiceToTextParser by lazy {
-        VoiceToTextParser(application = application, viewModel = textCapturingViewModel)
-    }
+    val voiceToTextParser = textCapturingViewModel.voiceToTextParser
     val voiceToTextState by voiceToTextParser.state.collectAsState()
 
     val recordAudioLauncher =
@@ -97,10 +95,8 @@ fun TextCapturingScreen(
                 enabled = uiState.canUseRecord && uiState.recordingGranted,
                 onClick = {
                     Log.d(TAG, "Voice to text state: $voiceToTextState")
-                    textCapturingViewModel.updateListeningState(!uiState.isListening)
                     if (voiceToTextState.isListening) {
                         voiceToTextParser.stopListening()
-                        textCapturingViewModel.updateCanUseRecord(false)
                     } else {
                         voiceToTextParser.startListening(Locale.current.language)
                     }

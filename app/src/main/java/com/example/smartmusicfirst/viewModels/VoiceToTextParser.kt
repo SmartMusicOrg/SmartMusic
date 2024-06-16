@@ -52,6 +52,8 @@ class VoiceToTextParser(
 
     override fun onEndOfSpeech() {
         _state.update { it.copy(isListening = false) }
+        viewModel.updateCanUseRecord(false)
+        viewModel.updateListeningState(false)
     }
 
     override fun onError(errorCode: Int) {
@@ -76,6 +78,7 @@ class VoiceToTextParser(
 
     override fun onBeginningOfSpeech() {
         viewModel.updateCanUseSubmit(false)
+        viewModel.updateListeningState(true)
     }
 
     override fun onRmsChanged(p0: Float) = Unit

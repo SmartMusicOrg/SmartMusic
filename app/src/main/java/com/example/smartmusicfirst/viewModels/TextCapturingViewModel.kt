@@ -1,6 +1,8 @@
 package com.example.smartmusicfirst.viewModels
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.TAG
@@ -21,9 +23,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class TextCapturingViewModel : ViewModel() {
+class TextCapturingViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(TextCapturingUiState())
     val uiState: StateFlow<TextCapturingUiState> = _uiState.asStateFlow()
+
+    val voiceToTextParser: VoiceToTextParser = VoiceToTextParser(application, this)
 
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)

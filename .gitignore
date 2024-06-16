@@ -22,3 +22,4 @@ local.properties
 /.idea/copilot/chatSessions/xd.lck
 /app/src/main/res/raw/corticalio.properties
 /app/src/main/res/raw/gemini.properties
+/app/google-services.json
