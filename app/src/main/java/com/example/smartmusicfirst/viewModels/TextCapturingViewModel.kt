@@ -220,6 +220,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
         )
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,100L)
         recognizer.setRecognitionListener(this)
         recognizer.startListening(intent)
         _uiState.value =
