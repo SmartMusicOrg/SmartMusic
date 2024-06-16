@@ -94,12 +94,13 @@ fun TextCapturingScreen(
                 .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         ) {
             IconButton(
-                enabled = uiState.canUseRecord,
+                enabled = uiState.canUseRecord && uiState.recordingGranted,
                 onClick = {
                     Log.d(TAG, "Voice to text state: $voiceToTextState")
                     textCapturingViewModel.updateListeningState(!uiState.isListening)
                     if (voiceToTextState.isListening) {
                         voiceToTextParser.stopListening()
+                        textCapturingViewModel.updateCanUseRecord(false)
                     } else {
                         voiceToTextParser.startListening(Locale.current.language)
                     }
@@ -108,7 +109,13 @@ fun TextCapturingScreen(
                     .size(dimensionResource(id = R.dimen.height_large))
                     .clip(CircleShape)
                     .background(
-                        if (uiState.isListening) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        if (!uiState.canUseRecord || !uiState.recordingGranted)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                        else
+                            if (uiState.isListening)
+                                MaterialTheme.colorScheme.error
+                            else
+                                MaterialTheme.colorScheme.primary,
                         CircleShape
                     )
             ) {
@@ -129,6 +136,7 @@ fun TextCapturingScreen(
         }
 
         Button(
+            enabled = uiState.canUseSubmit,
             onClick = {
                 val properties =
                     Properties().apply { load(context.resources.openRawResource(R.raw.corticalio)) }

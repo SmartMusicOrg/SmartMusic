@@ -29,8 +29,16 @@ class TextCapturingViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(inputString = str)
     }
 
+    fun updateCanUseSubmit(canUseSubmit: Boolean) {
+        _uiState.value = _uiState.value.copy(canUseSubmit = canUseSubmit)
+    }
+
+    fun updateCanUseRecord(canUseRecord: Boolean) {
+        _uiState.value = _uiState.value.copy(canUseRecord = canUseRecord)
+    }
+
     fun enableRecording(isAvaileable: Boolean) {
-        _uiState.value = _uiState.value.copy(canUseRecord = isAvaileable)
+        _uiState.value = _uiState.value.copy(recordingGranted = isAvaileable)
     }
 
     fun updateListeningState(isListening: Boolean) {

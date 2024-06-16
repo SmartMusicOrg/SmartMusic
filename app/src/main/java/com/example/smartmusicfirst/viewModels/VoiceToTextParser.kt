@@ -24,6 +24,7 @@ class VoiceToTextParser(
 
     fun startListening(languageCode: String = "en") {
         _state.update { VoiceToTextState() }
+        viewModel.updateCanUseRecord(true)
 
         if (!SpeechRecognizer.isRecognitionAvailable(application)) {
             viewModel.updateInputString("Speech recognition is not available on this device")
@@ -58,16 +59,24 @@ class VoiceToTextParser(
         Log.e(TAG, "Error occurred: $errorMessage")
         _state.update { it.copy(isListening = false) }
         viewModel.updateInputString(errorMessage)
+        if (errorCode != SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
+            viewModel.updateCanUseRecord(true)
+        }
+        viewModel.updateCanUseSubmit(true)
     }
 
     override fun onResults(p0: Bundle?) {
         p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0)?.let { result ->
             Log.d(TAG, "Result: $result")
             viewModel.updateInputString(result)
+            viewModel.updateCanUseRecord(true)
+            viewModel.updateCanUseSubmit(true)
         }
     }
 
-    override fun onBeginningOfSpeech() = Unit
+    override fun onBeginningOfSpeech() {
+        viewModel.updateCanUseSubmit(false)
+    }
 
     override fun onRmsChanged(p0: Float) = Unit
 
