@@ -12,6 +12,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.smartmusicfirst.data.Routs
 import com.example.smartmusicfirst.ui.views.ContactUsScreen
 import com.example.smartmusicfirst.ui.views.HomePageScreen
+import com.example.smartmusicfirst.ui.views.ImageCapturingScreen
 import com.example.smartmusicfirst.ui.views.MySimpleAppContainer
 import com.example.smartmusicfirst.ui.views.PlaceHolderScreen
 import com.example.smartmusicfirst.ui.views.TextCapturingScreen
@@ -45,9 +46,7 @@ fun NavigationMenu(
         }
 
         composable(Routs.ImageCapturing.name) {
-            PlaceHolderScreen(
-                title = "Missing",
-                message = "This page is not implemented yet.",
+            ImageCapturingScreen(
                 modifier = modifier.fillMaxSize()
             )
         }

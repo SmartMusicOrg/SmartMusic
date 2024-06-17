@@ -82,6 +82,14 @@ dependencies {
     implementation("io.coil-kt:coil-compose:1.3.1")
     implementation("com.google.ai.client.generativeai:generativeai:0.8.0")
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.6.8")
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+
+
 
     testImplementation("junit:junit:4.13.2")
 
