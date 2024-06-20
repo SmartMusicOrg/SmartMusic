@@ -45,6 +45,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
+        _uiState.value = _uiState.value.copy(canUseRecord = false, canUseSubmit = false)
         viewModelScope.launch {
             try {
                 // Take the keywords
