@@ -21,5 +21,10 @@
     <dimen name="height_large">48dp</dimen>
     <dimen name="height_extra_large">64dp</dimen>
 
+    <dimen name="text_box_height_small">40dp</dimen>
+    <dimen name="text_box_height_medium">100dp</dimen>
+    <dimen name="text_box_height_large">300dp</dimen>
+    <dimen name="text_box_height_extra_large">500dp</dimen>
+
     <dimen name="image_size_large">100dp</dimen>
 </resources>

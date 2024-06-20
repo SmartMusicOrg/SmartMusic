@@ -60,7 +60,6 @@ fun TextCapturingScreen(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
             .padding(
                 horizontal = dimensionResource(id = R.dimen.padding_medium),

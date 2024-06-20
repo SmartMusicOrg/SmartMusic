@@ -41,7 +41,7 @@ fun NavigationMenu(
 
         composable(Routs.TextCapturing.name) {
             TextCapturingScreen(
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
