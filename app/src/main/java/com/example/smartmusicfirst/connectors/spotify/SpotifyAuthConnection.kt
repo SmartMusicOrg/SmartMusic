@@ -54,7 +54,12 @@ object SpotifyAuthConnection {
             AuthorizationResponse.Type.TOKEN,
             redirectUri
         )
-            .setScopes(arrayOf("playlist-modify-public","playlist-modify-private","user-read-private", "user-read-email", "user-library-read"))
+            .setScopes(arrayOf("playlist-modify-public",
+                "playlist-modify-private",
+                "user-read-private",
+                "user-read-email",
+                "user-follow-read",
+                "user-library-read"))
             .setCustomParam("show_dialog", "true")
             .build()
 

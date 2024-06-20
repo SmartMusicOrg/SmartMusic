@@ -22,11 +22,13 @@ object SpotifyWebApi {
 
     lateinit var accessToken: String
     lateinit var currentUser: SpotifyUser
+    lateinit var favoriteArtists: List<SpotifyArtist>
 
     suspend fun init(context: Context, accessToken: String) {
         applicationContext = context.applicationContext
         this.accessToken = accessToken
-        currentUser = this.getCurrentUserDetails ()
+        currentUser = this.getCurrentUserDetails()
+        favoriteArtists = this.getFollowedArtists()
     }
 
     fun searchForPlaylist(playlistName: String, callback: (String) -> Unit) {
@@ -209,43 +211,48 @@ object SpotifyWebApi {
         Volley.newRequestQueue(applicationContext).add(request)
     }
 
-    private fun getFollowedArtists(callback: (List<SpotifyArtist>) -> Unit) {
-        val url = "https://api.spotify.com/v1/me/following?type=artist&limit=5"
-
-        val request = object : JsonObjectRequest(
-            Method.GET,
-            url,
-            null,
-            Response.Listener { response ->
-                val artists = mutableListOf<SpotifyArtist>()
-                val responseItems = response.getJSONObject("artists").getJSONArray("items")
-                for (i in 0 until responseItems.length()) {
-                    val item = responseItems.getJSONObject(i)
-                    val artist = SpotifyArtist(
-                        uri = item.getString("uri"),
-                        name = item.getString("name"),
-                        genres = item.getJSONArray("genres").let { genres ->
-                            List(genres.length()) { genres.getString(it) }
+    private suspend fun getFollowedArtists(): List<SpotifyArtist> =
+        suspendCoroutine { continuation ->
+            val url = "https://api.spotify.com/v1/me/following?type=artist&limit=5"
+            val request = object : JsonObjectRequest(
+                Method.GET,
+                url,
+                null,
+                Response.Listener { response ->
+                    try {
+                        val artists = mutableListOf<SpotifyArtist>()
+                        val responseItems = response.getJSONObject("artists").getJSONArray("items")
+                        for (i in 0 until responseItems.length()) {
+                            val item = responseItems.getJSONObject(i)
+                            val artist = SpotifyArtist(
+                                uri = item.getString("uri"),
+                                name = item.getString("name"),
+                                genres = item.getJSONArray("genres").let { genres ->
+                                    List(genres.length()) { genres.getString(it) }
+                                }
+                            )
+                            artists.add(artist)
                         }
-                    )
-                    artists.add(artist)
+                        Log.d(DEBUG_TAG, "Artists: $artists")
+                        continuation.resumeWith(Result.success(artists))
+                    } catch (e: JSONException) {
+                        Log.e(TAG, "Error parsing followed artists: ${e.message}", e)
+                        continuation.resumeWith(Result.failure(e))
+                    }
+                },
+                Response.ErrorListener { error ->
+                    Log.e(TAG, "Error fetching followed artists: ${error.message}", error)
+                    continuation.resumeWith(Result.failure(error))
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $accessToken"
+                    return headers
                 }
-                Log.d(DEBUG_TAG, "Artists: $artists")
-                callback(artists)
-            },
-            Response.ErrorListener { error ->
-                Log.e(TAG, "Error fetching followed artists: ${error.message}", error)
-                callback(emptyList())
-            }) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $accessToken"
-                return headers
             }
-        }
 
-        // Add the request to the request queue
-        Volley.newRequestQueue(applicationContext).add(request)
-    }
+            // Add the request to the request queue
+            Volley.newRequestQueue(applicationContext).add(request)
+        }
 
 }
