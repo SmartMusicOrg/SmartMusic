@@ -3,6 +3,8 @@ package com.example.smartmusicfirst.viewModels
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -33,7 +35,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     private val app = application
     private val _uiState = MutableStateFlow(TextCapturingUiState())
     val uiState: StateFlow<TextCapturingUiState> = _uiState.asStateFlow()
-    private val recognizer = SpeechRecognizer.createSpeechRecognizer(application)
+    private var recognizer = SpeechRecognizer.createSpeechRecognizer(application)
 
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)
@@ -221,7 +223,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         )
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,100L)
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1700L)
         recognizer.setRecognitionListener(this)
         recognizer.startListening(intent)
         _uiState.value =
@@ -229,11 +231,22 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun stopListening() {
-        recognizer.stopListening()
-        _uiState.value = _uiState.value.copy(isListening = false)
-        _uiState.value = _uiState.value.copy(canUseRecord = false)
-
+        if (_uiState.value.isListening) {
+            _uiState.value = _uiState.value.copy(isListening = false, canUseRecord = false)
+            Handler(Looper.getMainLooper()).postDelayed({
+                recognizer.stopListening()
+                recognizer.destroy()
+                _uiState.value = _uiState.value.copy(canUseSubmit = true)
+                recognizer = SpeechRecognizer.createSpeechRecognizer(app).apply {
+                    setRecognitionListener(this@TextCapturingViewModel)
+                }
+                _uiState.value = _uiState.value.copy(canUseRecord = true)
+            }, 2000)
+        } else {
+            Log.d(TAG, "stopListening called but recognizer is not listening")
+        }
     }
+
 
     override fun onReadyForSpeech(p0: Bundle?) {
     }
@@ -257,8 +270,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0)?.let { result ->
             Log.d(TAG, "Result: $result")
             this.updateInputString(result)
-            _uiState.value = _uiState.value.copy(canUseRecord = true)
-            _uiState.value = _uiState.value.copy(canUseSubmit = true)
+            _uiState.value = _uiState.value.copy(canUseRecord = true, canUseSubmit = true)
         }
     }
 
@@ -288,7 +300,12 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
     override fun onBufferReceived(p0: ByteArray?) = Unit
 
-    override fun onPartialResults(p0: Bundle?) = Unit
+    override fun onPartialResults(p0: Bundle?) {
+        p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0)?.let { result ->
+            Log.d(TAG, "Result: $result")
+            this.updateInputString(result)
+        }
+    }
 
     override fun onEvent(p0: Int, p1: Bundle?) = Unit
 
