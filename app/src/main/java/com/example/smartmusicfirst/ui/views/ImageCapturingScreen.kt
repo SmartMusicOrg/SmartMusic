@@ -16,9 +16,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,7 +42,7 @@ import java.util.*
 fun ImageCapturingScreen(
     modifier: Modifier = Modifier,
     title: String = "Capture Image",
-    message: String = "Tap a button below to capture an image or select from gallery.",
+    message: String = "Tap a button below to capture an image or select from gallery."
 ) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -117,13 +115,7 @@ fun ImageCapturingScreen(
             modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         )
 
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.secondary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
+
 
         imageBitmap?.let {
             Image(bitmap = it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(200.dp))
@@ -135,14 +127,20 @@ fun ImageCapturingScreen(
                     .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Star,
+                Image(
+                    painter = painterResource(id = R.drawable.add_a_photo), // Use your placeholder vector drawable here
                     contentDescription = "Placeholder",
-                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                     modifier = Modifier.size(64.dp)
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
         }
 
         Row {
@@ -153,10 +151,11 @@ fun ImageCapturingScreen(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary, CircleShape)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Done,
+                Image(
+                    painter = painterResource(id = R.drawable.photo_camera), // Use your camera vector drawable here
                     contentDescription = "Capture Image",
-                    tint = Color.White
+                    modifier = Modifier.size(32.dp),
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -165,12 +164,13 @@ fun ImageCapturingScreen(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondary, CircleShape)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Star,
+                Image(
+                    painter = painterResource(id = R.drawable.gallery), // Use your gallery vector drawable here
                     contentDescription = "Select from Gallery",
-                    tint = Color.White
+                    modifier = Modifier.size(32.dp),
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )
             }
         }
