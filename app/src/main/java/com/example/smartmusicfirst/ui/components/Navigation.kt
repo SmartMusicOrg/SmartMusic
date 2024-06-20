@@ -47,7 +47,7 @@ fun NavigationMenu(
 
         composable(Routs.ImageCapturing.name) {
             ImageCapturingScreen(
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -55,7 +55,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -63,7 +63,7 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -71,19 +71,19 @@ fun NavigationMenu(
             PlaceHolderScreen(
                 title = "Missing",
                 message = "This page is not implemented yet.",
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
         composable(Routs.ContactUs.name) {
             ContactUsScreen(
-                modifier = modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             )
         }
 
         composable(Routs.EmotionsButtons.name) {
             MySimpleAppContainer(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize()
             )
