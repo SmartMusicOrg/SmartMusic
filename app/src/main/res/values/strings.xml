@@ -4,6 +4,7 @@
 
     <string name="homePage_title">Welcome to SmartMusic!</string>
     <string name="homePage_title_icon">Home</string>
+    <string name="greeting">Hello, %1$s!</string>
 
     <string name="emotionButtonsPage_title">Emotion Buttons</string>
     <string name="emotionButtonsPage_description">Choose your emotion and get music accordingly…</string>

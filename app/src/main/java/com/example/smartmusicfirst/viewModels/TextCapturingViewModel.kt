@@ -20,7 +20,6 @@ import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
 import com.example.smartmusicfirst.models.KeywordCroticalio
 import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
-import com.example.smartmusicfirst.models.SpotifyUser
 import com.example.smartmusicfirst.playPlaylist
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
@@ -41,8 +40,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         _uiState.value = _uiState.value.copy(inputString = str)
     }
 
-    fun enableRecording(isAvaileable: Boolean) {
-        _uiState.value = _uiState.value.copy(recordingGranted = isAvaileable)
+    fun enableRecording(isAvailable: Boolean) {
+        _uiState.value = _uiState.value.copy(recordingGranted = isAvailable)
     }
 
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
@@ -63,11 +62,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 // Get the songs from Spotify
                 val songsList = getSongsList(songs).await()
 
-                // Get the current user
-                val user = getCurrentUser().await()
-
                 // Create a playlist that will contain all the songs
-                val playlist = createPlaylist(user.id).await()
+                val playlist = createPlaylist(SpotifyWebApi.currentUser.id).await()
 
                 // Add the songs to the playlist
                 val songUris = songsList.map { it.uri }
@@ -163,20 +159,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             }
         }
 
-        return deferred
-    }
-
-    private fun getCurrentUser(): CompletableDeferred<SpotifyUser> {
-        val deferred = CompletableDeferred<SpotifyUser>()
-        if (SpotifyWebApi.currentUser != null) {
-            SpotifyWebApi.getCurrentUserDetails { user ->
-                deferred.complete(user)
-            }
-            return deferred
-        }
-        SpotifyWebApi.getCurrentUserDetails { user ->
-            deferred.complete(user)
-        }
         return deferred
     }
 

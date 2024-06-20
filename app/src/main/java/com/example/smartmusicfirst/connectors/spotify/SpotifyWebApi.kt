@@ -15,16 +15,18 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.URLEncoder
+import kotlin.coroutines.suspendCoroutine
 
 object SpotifyWebApi {
     private lateinit var applicationContext: Context
 
-    var accessToken: String = ""
-    var currentUser: SpotifyUser? = null
+    lateinit var accessToken: String
+    lateinit var currentUser: SpotifyUser
 
-    fun init(context: Context, accessToken: String) {
+    suspend fun init(context: Context, accessToken: String) {
         applicationContext = context.applicationContext
         this.accessToken = accessToken
+        currentUser = this.getCurrentUserDetails ()
     }
 
     fun searchForPlaylist(playlistName: String, callback: (String) -> Unit) {
@@ -99,80 +101,6 @@ object SpotifyWebApi {
         Volley.newRequestQueue(applicationContext).add(request)
     }
 
-    fun getCurrentUserDetails(callback: (SpotifyUser) -> Unit) {
-        val url = "https://api.spotify.com/v1/me"
-
-        val request = object : JsonObjectRequest(
-            Method.GET,
-            url,
-            null,
-            Response.Listener { response ->
-                val user = SpotifyUser(
-                    uri = response.getString("uri"),
-                    id = response.getString("id"),
-                    displayName = response.getString("display_name"),
-                    images = response.getJSONArray("images").let { images ->
-                        List(images.length()) { images.getJSONObject(it).getString("url") }
-                    },
-                    product = response.getString("product")
-                )
-                Log.d(DEBUG_TAG, "User: $user")
-                currentUser = user
-                callback(user)
-            },
-            Response.ErrorListener { error ->
-                Log.e(TAG, "Error fetching user details: ${error.message}", error)
-            }) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $accessToken"
-                return headers
-            }
-        }
-
-        // Add the request to the request queue
-        Volley.newRequestQueue(applicationContext).add(request)
-    }
-
-    fun getFollowedArtists(callback: (List<SpotifyArtist>) -> Unit) {
-        val url = "https://api.spotify.com/v1/me/following?type=artist&limit=5"
-
-        val request = object : JsonObjectRequest(
-            Method.GET,
-            url,
-            null,
-            Response.Listener { response ->
-                val artists = mutableListOf<SpotifyArtist>()
-                val responseItems = response.getJSONObject("artists").getJSONArray("items")
-                for (i in 0 until responseItems.length()) {
-                    val item = responseItems.getJSONObject(i)
-                    val artist = SpotifyArtist(
-                        uri = item.getString("uri"),
-                        name = item.getString("name"),
-                        genres = item.getJSONArray("genres").let { genres ->
-                            List(genres.length()) { genres.getString(it) }
-                        }
-                    )
-                    artists.add(artist)
-                }
-                Log.d(DEBUG_TAG, "Artists: $artists")
-                callback(artists)
-            },
-            Response.ErrorListener { error ->
-                Log.e(TAG, "Error fetching followed artists: ${error.message}", error)
-                callback(emptyList())
-            }) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $accessToken"
-                return headers
-            }
-        }
-
-        // Add the request to the request queue
-        Volley.newRequestQueue(applicationContext).add(request)
-    }
-
     fun createPlaylist(userId: String, playlistName: String, callback: (SpotifyPlaylist?) -> Unit) {
         val url = "https://api.spotify.com/v1/users/$userId/playlists"
         val body = JSONObject().apply {
@@ -216,7 +144,6 @@ object SpotifyWebApi {
         Volley.newRequestQueue(applicationContext).add(request)
     }
 
-
     fun addItemsToExistingPlaylist(playlistId: String, songUris: List<String>) {
         val url = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
         val body = JSONObject().apply {
@@ -236,6 +163,83 @@ object SpotifyWebApi {
                 val headers = HashMap<String, String>()
                 headers["Authorization"] = "Bearer $accessToken"
                 headers["Content-Type"] = "application/json"
+                return headers
+            }
+        }
+
+        // Add the request to the request queue
+        Volley.newRequestQueue(applicationContext).add(request)
+    }
+
+    private suspend fun getCurrentUserDetails(): SpotifyUser = suspendCoroutine { continuation ->
+        val url = "https://api.spotify.com/v1/me"
+        val request = object : JsonObjectRequest(
+            Method.GET,
+            url,
+            null,
+            Response.Listener { response ->
+                try {
+                    val user = SpotifyUser(
+                        uri = response.getString("uri"),
+                        id = response.getString("id"),
+                        displayName = response.getString("display_name"),
+                        images = response.getJSONArray("images").let { images ->
+                            List(images.length()) { images.getJSONObject(it).getString("url") }
+                        },
+                        product = response.getString("product")
+                    )
+                    Log.d(DEBUG_TAG, "User: $user")
+                    continuation.resumeWith(Result.success(user))
+                } catch (e: JSONException) {
+                    Log.e(TAG, "Error parsing user details: ${e.message}", e)
+                    continuation.resumeWith(Result.failure(e))
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.e(TAG, "Error fetching user details: ${error.message}", error)
+                continuation.resumeWith(Result.failure(error))
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer $accessToken"
+                return headers
+            }
+        }
+
+        Volley.newRequestQueue(applicationContext).add(request)
+    }
+
+    private fun getFollowedArtists(callback: (List<SpotifyArtist>) -> Unit) {
+        val url = "https://api.spotify.com/v1/me/following?type=artist&limit=5"
+
+        val request = object : JsonObjectRequest(
+            Method.GET,
+            url,
+            null,
+            Response.Listener { response ->
+                val artists = mutableListOf<SpotifyArtist>()
+                val responseItems = response.getJSONObject("artists").getJSONArray("items")
+                for (i in 0 until responseItems.length()) {
+                    val item = responseItems.getJSONObject(i)
+                    val artist = SpotifyArtist(
+                        uri = item.getString("uri"),
+                        name = item.getString("name"),
+                        genres = item.getJSONArray("genres").let { genres ->
+                            List(genres.length()) { genres.getString(it) }
+                        }
+                    )
+                    artists.add(artist)
+                }
+                Log.d(DEBUG_TAG, "Artists: $artists")
+                callback(artists)
+            },
+            Response.ErrorListener { error ->
+                Log.e(TAG, "Error fetching followed artists: ${error.message}", error)
+                callback(emptyList())
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer $accessToken"
                 return headers
             }
         }
