@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -41,15 +42,15 @@ import java.util.*
 
 @Composable
 fun ImageCapturingScreen(
+    modifier: Modifier = Modifier,
     title: String = "Capture Image",
-    message: String = "Tap the button below to capture an image.",
-    modifier: Modifier = Modifier
+    message: String = "Tap a button below to capture an image or select from gallery.",
 ) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
+    val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
@@ -57,6 +58,15 @@ fun ImageCapturingScreen(
                 imageBitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(it))
                 Toast.makeText(context, "Image saved to gallery!", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageBitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(it))
+            Toast.makeText(context, "Image selected from gallery!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -69,7 +79,7 @@ fun ImageCapturingScreen(
         if (cameraPermissionGranted && storagePermissionGranted) {
             val uri = createImageFile(context)
             imageUri = uri
-            launcher.launch(uri)
+            cameraLauncher.launch(uri)
         } else {
             Toast.makeText(context, "Permissions not granted", Toast.LENGTH_SHORT).show()
         }
@@ -86,14 +96,14 @@ fun ImageCapturingScreen(
         } else {
             val uri = createImageFile(context)
             imageUri = uri
-            launcher.launch(uri)
+            cameraLauncher.launch(uri)
         }
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color(0xFFFFFFFF))
+            .background(color = MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp, vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -102,7 +112,7 @@ fun ImageCapturingScreen(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             fontSize = 32.sp,
-            color = Color(0xFFFFC107),
+            color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
         )
@@ -110,7 +120,7 @@ fun ImageCapturingScreen(
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
-            color = Color(0xFFBB86FC),
+            color = MaterialTheme.colorScheme.secondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -118,22 +128,51 @@ fun ImageCapturingScreen(
         imageBitmap?.let {
             Image(bitmap = it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(200.dp))
             Spacer(modifier = Modifier.height(16.dp))
+        } ?: run {
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Placeholder",
+                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                    modifier = Modifier.size(64.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        IconButton(
-            onClick = {
-                ensurePermissionsAndCaptureImage()
-            },
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFBB86FC), CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = "Capture Image",
-                tint = Color.White
-            )
+        Row {
+            IconButton(
+                onClick = { ensurePermissionsAndCaptureImage() },
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = "Capture Image",
+                    tint = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            IconButton(
+                onClick = { galleryLauncher.launch("image/*") },
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondary, CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Select from Gallery",
+                    tint = Color.White
+                )
+            }
         }
     }
 }
