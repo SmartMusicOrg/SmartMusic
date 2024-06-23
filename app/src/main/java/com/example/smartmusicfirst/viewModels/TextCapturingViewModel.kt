@@ -55,6 +55,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
                 // Give Gemini the keywords and extract relevant songs
                 val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
+                Log.d(DEBUG_TAG, "Gemini response: $response")
 
                 // Clean the response of Gemini
                 val songs = getSongsNamesFromGeminiResponse(response)
@@ -78,6 +79,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 //me and my girlfriend having fun together
             } catch (e: Exception) {
                 Log.e(DEBUG_TAG, "Error during API calls", e)
+                updateInputString("Error during API calls")
+                _uiState.value = _uiState.value.copy(canUseRecord = true, canUseSubmit = true)
             }
         }
     }
@@ -121,15 +124,20 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun getSongsNamesFromGeminiResponse(response: String): List<String> {
-        val rows = response.split("\n")
         val songs = mutableListOf<String>()
-        for (row in rows) {
-            if (row.isNotEmpty()) {
-                row.replace("\"", "")
-                row.subSequence(2, row.length).toString().let {
-                    songs.add(it)
+        try {
+            val rows = response.split("\n")
+            for (row in rows) {
+                if (row.isNotEmpty()) {
+                    row.replace("\"", "")
+                    row.subSequence(2, row.length).toString().let {
+                        songs.add(it)
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Log.e(DEBUG_TAG, "Error during parsing Gemini response", e)
+            updateInputString("Can not find songs to play. Please try again.")
         }
         return songs
     }
