@@ -22,6 +22,7 @@ fun SmartMusicScreen(
     val currentScreen = Routs.valueOf(backStackEntry?.destination?.route ?: Routs.HomePage.name)
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             SmartMusicTopBar(
                 currentScreen = currentScreen,

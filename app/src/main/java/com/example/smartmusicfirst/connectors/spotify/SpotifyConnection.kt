@@ -2,8 +2,8 @@ package com.example.smartmusicfirst.connectors.spotify
 
 import android.content.Context
 import android.util.Log
+import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.R
-import com.example.smartmusicfirst.TAG
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.PlayerApi
@@ -58,7 +58,7 @@ object SpotifyConnection {
             clientId = properties.getProperty("spotify_client_id")
             redirectUri = properties.getProperty("spotify_redirect_uri")
         } catch (e: Exception) {
-            Log.e(TAG, "Error loading Spotify config: ${e.message}", e)
+            Log.e(DEBUG_TAG, "Error loading Spotify config: ${e.message}", e)
         }
         val connectionParams =
             ConnectionParams.Builder(clientId)
@@ -74,7 +74,7 @@ object SpotifyConnection {
             }
 
             override fun onFailure(throwable: Throwable?) {
-                Log.e(TAG, "Connection failed: ${throwable?.message}", throwable)
+                Log.e(DEBUG_TAG, "Connection failed: ${throwable?.message}", throwable)
             }
         }
 

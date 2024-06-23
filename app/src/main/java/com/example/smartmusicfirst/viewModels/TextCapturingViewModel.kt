@@ -12,7 +12,7 @@ import android.util.Log
 import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.smartmusicfirst.TAG
+import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
 import com.example.smartmusicfirst.connectors.gemini.GeminiApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
@@ -58,7 +58,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
                 // Clean the response of Gemini
                 val songs = getSongsNamesFromGeminiResponse(response)
-                Log.d(TAG, "Songs: $songs")
+                Log.d(DEBUG_TAG, "Songs: $songs")
 
                 // Get the songs from Spotify
                 val songsList = getSongsList(songs).await()
@@ -68,14 +68,16 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
                 // Add the songs to the playlist
                 val songUris = songsList.map { it.uri }
+                Log.d(DEBUG_TAG, "Song URIs: $songUris")
 
-                addSongsToPlaylist(playlist.id, songUris)
+                SpotifyWebApi.addItemsToExistingPlaylist(playlist.id, songUris).await()
+                Log.d(DEBUG_TAG, "Songs added to playlist")
 
                 // Play the playlist
                 playPlaylist(playlist.uri)
                 //me and my girlfriend having fun together
             } catch (e: Exception) {
-                Log.e(TAG, "Error during API calls", e)
+                Log.e(DEBUG_TAG, "Error during API calls", e)
             }
         }
     }
@@ -103,7 +105,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     ): CompletableDeferred<String> {
         val deferred = CompletableDeferred<String>()
         val keywordsTemplate = listOfKeywords.joinToString(" ") { it.word }
-        Log.d(TAG, "Keywords template: $keywordsTemplate")
+        Log.d(DEBUG_TAG, "Keywords template: $keywordsTemplate")
         val inputQuery =
             "give me list of top fifteen popular songs that connected to the following words: $keywordsTemplate give only the list without any other world accept the list"
 
@@ -174,16 +176,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         return deferred
     }
 
-    private fun addSongsToPlaylist(playlistId: String, songUris: List<String>) {
-        viewModelScope.launch {
-            try {
-                SpotifyWebApi.addItemsToExistingPlaylist(playlistId, songUris)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error adding songs to playlist", e)
-            }
-        }
-    }
-
     fun speechToTextButtonClicked() {
         if (_uiState.value.isListening) {
             stopListening()
@@ -226,7 +218,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 _uiState.value = _uiState.value.copy(canUseRecord = true)
             }, 2000)
         } else {
-            Log.d(TAG, "stopListening called but recognizer is not listening")
+            Log.d(DEBUG_TAG, "stopListening called but recognizer is not listening")
         }
     }
 
@@ -241,7 +233,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
     override fun onError(errorCode: Int) {
         val errorMessage = getErrorText(errorCode)
-        Log.e(TAG, "Error occurred: $errorMessage")
+        Log.e(DEBUG_TAG, "Error occurred: $errorMessage")
         this.updateInputString(errorMessage)
         if (errorCode != SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
             _uiState.value = _uiState.value.copy(canUseRecord = true, isListening = false)
@@ -251,7 +243,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
     override fun onResults(p0: Bundle?) {
         p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0)?.let { result ->
-            Log.d(TAG, "Result: $result")
+            Log.d(DEBUG_TAG, "Result: $result")
             this.updateInputString(result)
             _uiState.value = _uiState.value.copy(canUseRecord = true, canUseSubmit = true)
         }
@@ -285,7 +277,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
     override fun onPartialResults(p0: Bundle?) {
         p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0)?.let { result ->
-            Log.d(TAG, "Result: $result")
+            Log.d(DEBUG_TAG, "Result: $result")
             this.updateInputString(result)
         }
     }

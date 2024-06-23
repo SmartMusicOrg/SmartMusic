@@ -1,7 +1,7 @@
 package com.example.smartmusicfirst.connectors.gemini
 
 import android.util.Log
-import com.example.smartmusicfirst.TAG
+import com.example.smartmusicfirst.DEBUG_TAG
 import com.google.ai.client.generativeai.GenerativeModel
 
 
@@ -16,7 +16,7 @@ object GeminiApi {
             val response = generativeModel.generateContent(inputQuery)
             res = response.text ?: ""
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting response: ${e.message}", e)
+            Log.e(DEBUG_TAG, "Error getting response: ${e.message}", e)
         }
         return res
     }

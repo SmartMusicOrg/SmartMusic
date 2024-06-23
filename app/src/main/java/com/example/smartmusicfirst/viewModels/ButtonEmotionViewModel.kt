@@ -2,7 +2,7 @@ package com.example.smartmusicfirst.viewModels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.smartmusicfirst.TAG
+import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.playPlaylist
 
@@ -12,7 +12,7 @@ class ButtonEmotionViewModel : ViewModel() {
             if (playlistId.isNotEmpty()) {
                 playPlaylist(playlistId)
             } else {
-                Log.e(TAG, "No playlist found")
+                Log.e(DEBUG_TAG, "No playlist found")
             }
         }
     }

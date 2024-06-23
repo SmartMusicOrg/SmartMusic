@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.R
-import com.example.smartmusicfirst.TAG
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -46,7 +46,7 @@ object SpotifyAuthConnection {
             clientId = properties.getProperty("spotify_client_id") ?: ""
             redirectUri = properties.getProperty("spotify_redirect_uri") ?: ""
         } catch (e: Exception) {
-            Log.e(TAG, "Error loading Spotify config: ${e.message}", e)
+            Log.e(DEBUG_TAG, "Error loading Spotify config: ${e.message}", e)
         }
 
         val request = AuthorizationRequest.Builder(

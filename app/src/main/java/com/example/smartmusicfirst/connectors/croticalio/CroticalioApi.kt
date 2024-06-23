@@ -5,7 +5,7 @@ import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.smartmusicfirst.TAG
+import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.models.KeywordCroticalio
 import org.json.JSONObject
 
@@ -51,12 +51,12 @@ object CroticalioApi {
                     callback(keywords)
                 } catch (e: Exception) {
                     errorCallback(e)
-                    Log.e(TAG, "Error parsing keywords: ${e.message}", e)
+                    Log.e(DEBUG_TAG, "Error parsing keywords: ${e.message}", e)
                 }
             },
             Response.ErrorListener { error ->
                 errorCallback(error)
-                Log.e(TAG, "Error getting keywords: ${error.message}", error)
+                Log.e(DEBUG_TAG, "Error getting keywords: ${error.message}", error)
             }) {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()

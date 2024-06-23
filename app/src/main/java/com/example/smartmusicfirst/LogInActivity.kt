@@ -11,14 +11,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyAuthConnectionListener
-import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
-import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.ui.views.LogInScreen
 import kotlinx.coroutines.launch
 
-class LogInActivity : ComponentActivity(), SpotifyConnectionListener,
-    SpotifyAuthConnectionListener {
+class LogInActivity : ComponentActivity(), SpotifyAuthConnectionListener {
 
     private val spotifyAuthLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -36,18 +33,13 @@ class LogInActivity : ComponentActivity(), SpotifyConnectionListener,
         SpotifyAuthConnection.initAuthConnection(this, this, spotifyAuthLauncher)
     }
 
-    override fun onSpotifyConnected() {
-    }
-
     override fun onSpotifyAuthSuccess(accessToken: String) {
         lifecycleScope.launch {
             try {
                 SpotifyWebApi.init(this@LogInActivity, accessToken)
-                SpotifyConnection.connect(this@LogInActivity, this@LogInActivity)
                 startActivity(Intent(this@LogInActivity, MainActivity::class.java))
                 finish() // Close the login activity
-            }
-            catch (e: Throwable) {
+            } catch (e: Throwable) {
                 Log.e(TAG, "Failed to connect to Spotify: ${e.message}", e)
                 setContent {
                     LogInScreen(::onLoginButtonClick, e.message ?: "Unknown error")

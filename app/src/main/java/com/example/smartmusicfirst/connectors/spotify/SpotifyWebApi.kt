@@ -6,11 +6,11 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.smartmusicfirst.DEBUG_TAG
-import com.example.smartmusicfirst.TAG
 import com.example.smartmusicfirst.models.SpotifyArtist
 import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.models.SpotifyUser
+import kotlinx.coroutines.CompletableDeferred
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -46,7 +46,7 @@ object SpotifyWebApi {
                 callback(playlistUri)
             },
             Response.ErrorListener { error ->
-                Log.e(TAG, "Error fetching playlist: ${error.message}", error)
+                Log.e(DEBUG_TAG, "Error fetching playlist: ${error.message}", error)
             }) {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
@@ -89,7 +89,7 @@ object SpotifyWebApi {
                 callback(spotifySongs)
             },
             Response.ErrorListener { error ->
-                Log.e(TAG, "Error fetching song: ${error.message}", error)
+                Log.e(DEBUG_TAG, "Error fetching song: ${error.message}", error)
                 callback(emptyList())
             }) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -126,12 +126,12 @@ object SpotifyWebApi {
                     Log.d(DEBUG_TAG, "Playlist: $playlist")
                     callback(playlist)
                 } catch (e: JSONException) {
-                    Log.e(TAG, "Error parsing playlist response: ${e.message}", e)
+                    Log.e(DEBUG_TAG, "Error parsing playlist response: ${e.message}", e)
                     callback(null)
                 }
             },
             Response.ErrorListener { error ->
-                Log.e(TAG, "Error creating playlist: ${error.message}", error)
+                Log.e(DEBUG_TAG, "Error creating playlist: ${error.message}", error)
                 callback(null)
             }) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -146,7 +146,8 @@ object SpotifyWebApi {
         Volley.newRequestQueue(applicationContext).add(request)
     }
 
-    fun addItemsToExistingPlaylist(playlistId: String, songUris: List<String>) {
+    fun addItemsToExistingPlaylist(playlistId: String, songUris: List<String>): CompletableDeferred<Unit> {
+        val deferred = CompletableDeferred<Unit>()
         val url = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
         val body = JSONObject().apply {
             put("uris", JSONArray(songUris))
@@ -157,9 +158,11 @@ object SpotifyWebApi {
             body,
             Response.Listener { response ->
                 Log.d(DEBUG_TAG, "Items added to playlist: $response")
+                deferred.complete(Unit) // Signal completion
             },
             Response.ErrorListener { error ->
-                Log.e(TAG, "Error adding items to playlist: ${error.message}", error)
+                Log.e(DEBUG_TAG, "Error adding items to playlist: ${error.message}", error)
+                deferred.completeExceptionally(Exception("Error adding items to playlist: ${error.message}"))
             }) {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
@@ -168,9 +171,8 @@ object SpotifyWebApi {
                 return headers
             }
         }
-
-        // Add the request to the request queue
         Volley.newRequestQueue(applicationContext).add(request)
+        return deferred
     }
 
     private suspend fun getCurrentUserDetails(): SpotifyUser = suspendCoroutine { continuation ->
@@ -193,12 +195,12 @@ object SpotifyWebApi {
                     Log.d(DEBUG_TAG, "User: $user")
                     continuation.resumeWith(Result.success(user))
                 } catch (e: JSONException) {
-                    Log.e(TAG, "Error parsing user details: ${e.message}", e)
+                    Log.e(DEBUG_TAG, "Error parsing user details: ${e.message}", e)
                     continuation.resumeWith(Result.failure(e))
                 }
             },
             Response.ErrorListener { error ->
-                Log.e(TAG, "Error fetching user details: ${error.message}", error)
+                Log.e(DEBUG_TAG, "Error fetching user details: ${error.message}", error)
                 continuation.resumeWith(Result.failure(error))
             }) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -236,12 +238,12 @@ object SpotifyWebApi {
                         Log.d(DEBUG_TAG, "Artists: $artists")
                         continuation.resumeWith(Result.success(artists))
                     } catch (e: JSONException) {
-                        Log.e(TAG, "Error parsing followed artists: ${e.message}", e)
+                        Log.e(DEBUG_TAG, "Error parsing followed artists: ${e.message}", e)
                         continuation.resumeWith(Result.failure(e))
                     }
                 },
                 Response.ErrorListener { error ->
-                    Log.e(TAG, "Error fetching followed artists: ${error.message}", error)
+                    Log.e(DEBUG_TAG, "Error fetching followed artists: ${error.message}", error)
                     continuation.resumeWith(Result.failure(error))
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
