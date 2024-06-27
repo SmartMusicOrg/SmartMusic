@@ -5,5 +5,6 @@ data class TextCapturingUiState(
     val recordingGranted: Boolean = false,
     val isListening: Boolean = false,
     val canUseRecord: Boolean = true,
-    val canUseSubmit: Boolean = true
+    val canUseSubmit: Boolean = true,
+    val errorMessage: String = ""
 )

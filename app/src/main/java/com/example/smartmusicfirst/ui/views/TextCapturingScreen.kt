@@ -1,5 +1,6 @@
 package com.example.smartmusicfirst.ui.views
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -55,6 +56,10 @@ fun TextCapturingScreen(
 
     LaunchedEffect(key1 = recordAudioLauncher) {
         recordAudioLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+    }
+
+    LaunchedEffect(key1 = uiState.errorMessage) {
+        Toast.makeText(context, uiState.errorMessage, Toast.LENGTH_LONG).show()
     }
 
     Column(

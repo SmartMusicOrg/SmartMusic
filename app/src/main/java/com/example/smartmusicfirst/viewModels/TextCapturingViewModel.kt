@@ -38,7 +38,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     private val _uiState = MutableStateFlow(TextCapturingUiState())
     val uiState: StateFlow<TextCapturingUiState> = _uiState.asStateFlow()
     private var recognizer = SpeechRecognizer.createSpeechRecognizer(application)
-    private val firebase = FirebaseApi()
 
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)
@@ -64,8 +63,11 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 Log.d(DEBUG_TAG, "Gemini response: $response")
 
                 if (response.isEmpty()) {
-                    updateInputString("Can not find songs to play. Please try again.")
-                    _uiState.value = _uiState.value.copy(canUseRecord = true, canUseSubmit = true)
+                    _uiState.value = _uiState.value.copy(
+                        canUseRecord = true,
+                        canUseSubmit = true,
+                        errorMessage = "Can not find songs to play. Please try again."
+                    )
                     return@launch
                 }
 
@@ -128,8 +130,11 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 //me and my girlfriend having fun together
             } catch (e: Exception) {
                 Log.e(DEBUG_TAG, "Error during API calls", e)
-                updateInputString("Error during API calls")
-                _uiState.value = _uiState.value.copy(canUseRecord = true, canUseSubmit = true)
+                _uiState.value = _uiState.value.copy(
+                    canUseRecord = true,
+                    canUseSubmit = true,
+                    errorMessage = e.message ?: "An error occurred"
+                )
             }
         }
     }
@@ -291,7 +296,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     override fun onError(errorCode: Int) {
         val errorMessage = getErrorText(errorCode)
         Log.e(DEBUG_TAG, "Error occurred: $errorMessage")
-        this.updateInputString(errorMessage)
+        _uiState.value = _uiState.value.copy(errorMessage = errorMessage)
         if (errorCode != SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
             _uiState.value = _uiState.value.copy(canUseRecord = true, isListening = false)
         }
