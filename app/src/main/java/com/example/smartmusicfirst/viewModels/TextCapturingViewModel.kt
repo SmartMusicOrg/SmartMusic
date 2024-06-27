@@ -14,6 +14,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
+import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
 import com.example.smartmusicfirst.connectors.gemini.GeminiApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
@@ -22,12 +23,14 @@ import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.playPlaylist
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TextCapturingViewModel(application: Application) : AndroidViewModel(application),
     RecognitionListener {
@@ -35,6 +38,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     private val _uiState = MutableStateFlow(TextCapturingUiState())
     val uiState: StateFlow<TextCapturingUiState> = _uiState.asStateFlow()
     private var recognizer = SpeechRecognizer.createSpeechRecognizer(application)
+    private val firebase = FirebaseApi()
 
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)
@@ -48,6 +52,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         _uiState.value = _uiState.value.copy(canUseRecord = false, canUseSubmit = false)
         viewModelScope.launch {
             try {
+                val firebaseApi = FirebaseApi()
+
                 // Take the keywords
                 val keywords = getKeywordDeferred(corticalioAccessToken).await()
 
@@ -57,12 +63,55 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
                 Log.d(DEBUG_TAG, "Gemini response: $response")
 
+                if (response.isEmpty()) {
+                    updateInputString("Can not find songs to play. Please try again.")
+                    _uiState.value = _uiState.value.copy(canUseRecord = true, canUseSubmit = true)
+                    return@launch
+                }
+
                 // Clean the response of Gemini
                 val songs = getSongsNamesFromGeminiResponse(response)
                 Log.d(DEBUG_TAG, "Songs: $songs")
 
                 // Get the songs from Spotify
                 val songsList = getSongsList(songs).await()
+
+
+                try {
+                    val queryDocRef = withContext(Dispatchers.IO) {
+                        firebaseApi.addDoc(
+                            "users/${SpotifyWebApi.currentUser.id}/queries",
+                            mapOf(
+                                "isImage" to false,
+                                "text" to _uiState.value.inputString,
+                                "keywords" to keywords.joinToString(", ") { it.word },
+                                "geminiResponse" to response,
+                                "songs" to songs.joinToString(", ")
+                            )
+                        )
+                    }
+
+                    if (queryDocRef != null) {
+                        songsList.forEach {
+                            withContext(Dispatchers.IO) {
+                                firebaseApi.addDoc(
+                                    "users/${SpotifyWebApi.currentUser.id}/queries/${queryDocRef.id}/songs",
+                                    mapOf(
+                                        "uri" to it.uri,
+                                        "name" to it.name,
+                                        "artist" to it.album,
+                                        "popularity" to it.popularity
+                                    )
+                                )
+                            }
+                        }
+                    } else {
+                        Log.e(DEBUG_TAG, "queryDocRef is null")
+                    }
+                } catch (e: Exception) {
+                    Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
+                }
+
 
                 // Create a playlist that will contain all the songs
                 val playlist = createPlaylist(SpotifyWebApi.currentUser.id).await()

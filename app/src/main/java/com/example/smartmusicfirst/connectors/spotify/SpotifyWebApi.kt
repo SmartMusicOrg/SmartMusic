@@ -6,6 +6,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.smartmusicfirst.DEBUG_TAG
+import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
 import com.example.smartmusicfirst.models.SpotifyArtist
 import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
@@ -25,10 +26,33 @@ object SpotifyWebApi {
     lateinit var favoriteArtists: List<SpotifyArtist>
 
     suspend fun init(context: Context, accessToken: String) {
+        val firebaseApi = FirebaseApi()
         applicationContext = context.applicationContext
         this.accessToken = accessToken
         currentUser = this.getCurrentUserDetails()
         favoriteArtists = this.getFollowedArtists()
+        try {
+            if (!firebaseApi.isExist("users", currentUser.id)) {
+                firebaseApi.createDoc(
+                    "users", currentUser.id, mapOf(
+                        "displayName" to currentUser.displayName,
+                        "imageUrl" to currentUser.images.firstOrNull(),
+                        "product" to currentUser.product
+                    )
+                )
+            }
+            // adding sub collection for favorite artists to user doc:
+            favoriteArtists.forEach { artist ->
+                firebaseApi.createDoc(
+                    "users/${currentUser.id}/favoriteArtists", artist.uri, mapOf(
+                        "name" to artist.name,
+                        "genres" to artist.genres
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(DEBUG_TAG, "Error adding user to firebase: ${e.message}", e)
+        }
     }
 
     fun searchForPlaylist(playlistName: String, callback: (String) -> Unit) {
@@ -146,7 +170,10 @@ object SpotifyWebApi {
         Volley.newRequestQueue(applicationContext).add(request)
     }
 
-    fun addItemsToExistingPlaylist(playlistId: String, songUris: List<String>): CompletableDeferred<Unit> {
+    fun addItemsToExistingPlaylist(
+        playlistId: String,
+        songUris: List<String>
+    ): CompletableDeferred<Unit> {
         val deferred = CompletableDeferred<Unit>()
         val url = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
         val body = JSONObject().apply {
