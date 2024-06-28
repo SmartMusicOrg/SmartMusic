@@ -19,6 +19,7 @@ import com.example.smartmusicfirst.connectors.datastore.DataStorePreferences
 import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
 import com.example.smartmusicfirst.connectors.gemini.GeminiApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
+import com.example.smartmusicfirst.data.LoadingHintsEnum
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
 import com.example.smartmusicfirst.models.KeywordCroticalio
 import com.example.smartmusicfirst.models.SpotifySong
@@ -51,17 +52,20 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
-        _uiState.value = _uiState.value.copy(canUseRecord = false, canUseSubmit = false)
+        _uiState.value =
+            _uiState.value.copy(canUseRecord = false, canUseSubmit = false, isLoading = true)
         viewModelScope.launch {
             val time = measureTimeMillis {
                 try {
-                    val firebaseApi = FirebaseApi()
-
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.KEYWORD_EXTRACT.hintState)
                     // Take the keywords
                     val keywords = getKeywordDeferred(corticalioAccessToken).await()
 
                     // Filter the keywords and get current user preferences
 
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.GET_AI_OFFER.hintState)
                     // Give Gemini the keywords and extract relevant songs
                     val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
                     Log.d(DEBUG_TAG, "Gemini response: $response")
@@ -75,6 +79,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                         return@launch
                     }
 
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.SONGS_EXTRACT.hintState)
                     // Clean the response of Gemini
                     val songs = getSongsNamesFromGeminiResponse(response)
                     Log.d(DEBUG_TAG, "Songs: $songs")
@@ -82,40 +88,43 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                     // Get the songs from Spotify
                     val songsList = getSongsList(songs)
 
-
-                    try {
-                        val queryDocRef = withContext(Dispatchers.IO) {
-                            firebaseApi.addDoc(
-                                "users/${SpotifyWebApi.currentUser.id}/queries",
-                                mapOf(
-                                    "isImage" to false,
-                                    "text" to _uiState.value.inputString,
-                                    "keywords" to keywords.joinToString(", ") { it.word },
-                                    "geminiResponse" to response,
-                                    "songs" to songs.joinToString(", ")
-                                )
-                            )
-                        }
-
-                        if (queryDocRef != null) {
-                            songsList.forEach {
-                                withContext(Dispatchers.IO) {
-                                    firebaseApi.addDoc(
-                                        "users/${SpotifyWebApi.currentUser.id}/queries/${queryDocRef.id}/songs",
-                                        mapOf(
-                                            "uri" to it.uri,
-                                            "name" to it.name,
-                                            "artist" to it.album,
-                                            "popularity" to it.popularity
-                                        )
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.BUILD_PLAYLIST.hintState)
+                    launch {
+                        try {
+                            val firebaseApi = FirebaseApi()
+                            val queryDocRef = withContext(Dispatchers.IO) {
+                                firebaseApi.addDoc(
+                                    "users/${SpotifyWebApi.currentUser.id}/queries",
+                                    mapOf(
+                                        "isImage" to false,
+                                        "text" to _uiState.value.inputString,
+                                        "keywords" to keywords.joinToString(", ") { it.word },
+                                        "geminiResponse" to response,
+                                        "songs" to songs.joinToString(", ")
                                     )
-                                }
+                                )
                             }
-                        } else {
-                            Log.e(DEBUG_TAG, "queryDocRef is null")
+                            if (queryDocRef != null) {
+                                songsList.forEach {
+                                    withContext(Dispatchers.IO) {
+                                        firebaseApi.addDoc(
+                                            "users/${SpotifyWebApi.currentUser.id}/queries/${queryDocRef.id}/songs",
+                                            mapOf(
+                                                "uri" to it.uri,
+                                                "name" to it.name,
+                                                "artist" to it.album,
+                                                "popularity" to it.popularity
+                                            )
+                                        )
+                                    }
+                                }
+                            } else {
+                                Log.e(DEBUG_TAG, "queryDocRef is null")
+                            }
+                        } catch (e: Exception) {
+                            Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
                         }
-                    } catch (e: Exception) {
-                        Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
                     }
 
                     DataStorePreferences.readData(app, stringPreferencesKey("lastPlaylistUri"))
@@ -149,6 +158,11 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
                     // Play the playlist
                     playPlaylist(playlist.uri)
+                    _uiState.value = _uiState.value.copy(
+                        canUseRecord = true,
+                        canUseSubmit = true,
+                        isLoading = false
+                    )
 
                     //me and my girlfriend having fun together
                 } catch (e: Exception) {
@@ -156,7 +170,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                     _uiState.value = _uiState.value.copy(
                         canUseRecord = true,
                         canUseSubmit = true,
-                        errorMessage = e.message ?: "An error occurred"
+                        errorMessage = e.message ?: "An error occurred",
+                        isLoading = false
                     )
                 }
             }

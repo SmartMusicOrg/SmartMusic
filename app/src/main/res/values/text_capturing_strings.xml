@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_search_method">Starting the search…</string>
+    <string name="keyword_extract">Extracting key words…</string>
+    <string name="get_ai_offer">Call to AI…</string>
+    <string name="songs_extract">Extracting songs…</string>
+    <string name="build_playlist">Building the playlist…</string>
+</resources>

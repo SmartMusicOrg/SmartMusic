@@ -6,9 +6,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +36,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,83 +65,100 @@ fun TextCapturingScreen(
     LaunchedEffect(key1 = uiState.errorMessage) {
         Toast.makeText(context, uiState.errorMessage, Toast.LENGTH_LONG).show()
     }
-
-    Column(
-        modifier = modifier
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.padding_medium),
-                vertical = dimensionResource(id = R.dimen.padding_large)
-            )
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "Search for a song",
-            style = MaterialTheme.typography.titleLarge,
-            fontSize = 32.sp,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
-        )
-
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
-        ) {
-            IconButton(
-                enabled = uiState.canUseRecord && uiState.recordingGranted,
-                onClick = { textCapturingViewModel.speechToTextButtonClicked() },
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.height_large))
-                    .clip(CircleShape)
-                    .background(
-                        if (!uiState.canUseRecord || !uiState.recordingGranted)
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                        else
-                            if (uiState.isListening)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.primary,
-                        CircleShape
-                    )
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.mic_icon),
-                    contentDescription = "Mic",
-                    colorFilter = ColorFilter.tint(Color.White)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_medium),
+                    vertical = dimensionResource(id = R.dimen.padding_large)
                 )
-            }
-            TextField(
-                value = uiState.inputString,
-                onValueChange = { textCapturingViewModel.updateInputString(it) },
-                placeholder = { Text("Express your feelings right now") },
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(end = dimensionResource(id = R.dimen.padding_small)) // Added padding for better spacing
-            )
-        }
-
-        Button(
-            enabled = uiState.canUseSubmit,
-            onClick = {
-                val properties =
-                    Properties().apply { load(context.resources.openRawResource(R.raw.corticalio)) }
-                val corticalioAccessToken = properties.getProperty("croticalio_access_token") ?: ""
-                properties.load(context.resources.openRawResource(R.raw.gemini))
-                val geminiApiKey = properties.getProperty("gemini_api_key") ?: ""
-                textCapturingViewModel.searchSong(corticalioAccessToken, geminiApiKey)
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .height(dimensionResource(id = R.dimen.height_large)),
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
             Text(
-                text = "Search",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White
+                text = "Search for a song",
+                style = MaterialTheme.typography.titleLarge,
+                fontSize = 32.sp,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
             )
+
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = dimensionResource(id = R.dimen.padding_medium))
+            ) {
+                IconButton(
+                    enabled = uiState.canUseRecord && uiState.recordingGranted,
+                    onClick = { textCapturingViewModel.speechToTextButtonClicked() },
+                    modifier = Modifier
+                        .size(dimensionResource(id = R.dimen.height_large))
+                        .clip(CircleShape)
+                        .background(
+                            if (!uiState.canUseRecord || !uiState.recordingGranted)
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                            else
+                                if (uiState.isListening)
+                                    MaterialTheme.colorScheme.error
+                                else
+                                    MaterialTheme.colorScheme.primary,
+                            CircleShape
+                        )
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.mic_icon),
+                        contentDescription = "Mic",
+                        colorFilter = ColorFilter.tint(Color.White)
+                    )
+                }
+                TextField(
+                    value = uiState.inputString,
+                    onValueChange = { textCapturingViewModel.updateInputString(it) },
+                    placeholder = { Text("Express your feelings right now") },
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(end = dimensionResource(id = R.dimen.padding_small)) // Added padding for better spacing
+                )
+            }
+
+            Button(
+                enabled = uiState.canUseSubmit,
+                onClick = {
+                    val properties =
+                        Properties().apply { load(context.resources.openRawResource(R.raw.corticalio)) }
+                    val corticalioAccessToken =
+                        properties.getProperty("croticalio_access_token") ?: ""
+                    properties.load(context.resources.openRawResource(R.raw.gemini))
+                    val geminiApiKey = properties.getProperty("gemini_api_key") ?: ""
+                    textCapturingViewModel.searchSong(corticalioAccessToken, geminiApiKey)
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(dimensionResource(id = R.dimen.height_large)),
+            ) {
+                Text(
+                    text = "Search",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White
+                )
+            }
+        }
+        if (uiState.isLoading) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+            ) {
+                CircularProgressIndicator()
+                Text(
+                    text = stringResource(id = uiState.userHint),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
