@@ -10,10 +10,12 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.compose.ui.text.intl.Locale
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.DEBUG_TAG
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
+import com.example.smartmusicfirst.connectors.datastore.DataStorePreferences
 import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
 import com.example.smartmusicfirst.connectors.gemini.GeminiApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
@@ -116,22 +118,38 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                         Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
                     }
 
-
+                    DataStorePreferences.readData(app, stringPreferencesKey("lastPlaylistUri"))
+                        .let {
+                            if (it.isNotEmpty()) {
+                                try {
+                                    SpotifyWebApi.unfollowPlaylist(it)
+                                } catch (e: Exception) {
+                                    Log.e(DEBUG_TAG, "some error during unfollowing", e)
+                                }
+                            }
+                        }
                     // Create a playlist that will contain all the songs
                     val playlist = SpotifyWebApi.createPlaylist(
                         SpotifyWebApi.currentUser.id,
                         "Smart Music First Playlist"
                     )
 
+                    DataStorePreferences.saveData(
+                        app,
+                        stringPreferencesKey("lastPlaylistUri"),
+                        playlist!!.id
+                    )
+
                     // Add the songs to the playlist
                     val songUris = songsList.map { it.uri }
                     Log.d(DEBUG_TAG, "Song URIs: $songUris")
 
-                    SpotifyWebApi.addItemsToExistingPlaylist(playlist!!.id, songUris)
+                    SpotifyWebApi.addItemsToExistingPlaylist(playlist.id, songUris)
                     Log.d(DEBUG_TAG, "Songs added to playlist")
 
                     // Play the playlist
                     playPlaylist(playlist.uri)
+
                     //me and my girlfriend having fun together
                 } catch (e: Exception) {
                     Log.e(DEBUG_TAG, "Error during API calls", e)
@@ -212,7 +230,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         }
         songsList.awaitAll()
     }
-
 
     fun speechToTextButtonClicked() {
         if (_uiState.value.isListening) {

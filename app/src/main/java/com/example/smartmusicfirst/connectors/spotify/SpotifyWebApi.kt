@@ -2,7 +2,9 @@ package com.example.smartmusicfirst.connectors.spotify
 
 import android.content.Context
 import android.util.Log
+import com.android.volley.NetworkResponse
 import com.android.volley.Response
+import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.smartmusicfirst.DEBUG_TAG
@@ -231,6 +233,87 @@ object SpotifyWebApi {
         }
     }
 
+    suspend fun unfollowPlaylist(playlistId: String): Unit = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val url = "https://api.spotify.com/v1/playlists/$playlistId/followers"
+            val request = object : JsonObjectRequest(
+                Method.DELETE,
+                url,
+                null,
+                Response.Listener {
+                    // Success - No response expected, so no action needed
+                    continuation.resume(Unit) // Signal completion
+                },
+                Response.ErrorListener { error ->
+                    // Error handling
+                    Log.e(DEBUG_TAG, "Error unfollowing playlist: ${error.message}", error)
+                    continuation.resumeWithException(Exception("Error unfollowing playlist: ${error.message}"))
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $accessToken"
+                    return headers
+                }
+
+                override fun parseNetworkResponse(response: NetworkResponse): Response<JSONObject> {
+                    // Override parseNetworkResponse to avoid JSON parsing
+                    return Response.success(
+                        JSONObject(),
+                        HttpHeaderParser.parseCacheHeaders(response)
+                    )
+                }
+            }
+
+            continuation.invokeOnCancellation {
+                request.cancel()
+            }
+
+            Volley.newRequestQueue(applicationContext).add(request)
+        }
+    }
+
+    suspend fun getPlaylist(playlistId: String): SpotifyPlaylist? = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val url = "https://api.spotify.com/v1/playlists/$playlistId"
+            val request = object : JsonObjectRequest(
+                Method.GET,
+                url,
+                null,
+                Response.Listener { response ->
+                    try {
+                        val playlist = SpotifyPlaylist(
+                            uri = response.getString("uri"),
+                            name = response.getString("name"),
+                            imageUrl = response.optJSONArray("images")?.optJSONObject(0)
+                                ?.optString("url", ""),
+                            id = response.getString("id")
+                        )
+                        Log.d(DEBUG_TAG, "Playlist: $playlist")
+                        continuation.resume(playlist)
+                    } catch (e: JSONException) {
+                        Log.e(DEBUG_TAG, "Error parsing playlist response: ${e.message}", e)
+                        continuation.resumeWithException(e)
+                    }
+                },
+                Response.ErrorListener { error ->
+                    Log.e(DEBUG_TAG, "Error fetching playlist: ${error.message}", error)
+                    continuation.resumeWithException(error)
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $accessToken"
+                    return headers
+                }
+            }
+
+            continuation.invokeOnCancellation {
+                request.cancel()
+            }
+
+            Volley.newRequestQueue(applicationContext).add(request)
+        }
+    }
+
     private suspend fun getCurrentUserDetails(): SpotifyUser = suspendCoroutine { continuation ->
         val url = "https://api.spotify.com/v1/me"
         val request = object : JsonObjectRequest(
@@ -312,4 +395,5 @@ object SpotifyWebApi {
             // Add the request to the request queue
             Volley.newRequestQueue(applicationContext).add(request)
         }
+
 }

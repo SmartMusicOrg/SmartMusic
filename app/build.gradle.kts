@@ -89,6 +89,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-rxjava2:1.6.8")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
 
 
