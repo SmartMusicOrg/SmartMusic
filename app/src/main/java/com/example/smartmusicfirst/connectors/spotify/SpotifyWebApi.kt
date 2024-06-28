@@ -11,11 +11,15 @@ import com.example.smartmusicfirst.models.SpotifyArtist
 import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.models.SpotifyUser
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.URLEncoder
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 object SpotifyWebApi {
@@ -84,122 +88,147 @@ object SpotifyWebApi {
 
     }
 
-    fun searchForSong(songName: String, callback: (List<SpotifySong>) -> Unit) {
-        val encodedSongName = URLEncoder.encode(songName, "UTF-8")
-        val url = "https://api.spotify.com/v1/search?q=$encodedSongName&type=track&limit=5"
+    suspend fun searchForSong(songName: String): List<SpotifySong> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val encodedSongName = URLEncoder.encode(songName, "UTF-8")
+            val url = "https://api.spotify.com/v1/search?q=$encodedSongName&type=track&limit=5"
 
-        val request = object : JsonObjectRequest(
-            Method.GET,
-            url,
-            null,
-            Response.Listener { response ->
-                val spotifySongs = mutableListOf<SpotifySong>()
-                val responseItems = response.getJSONObject("tracks").getJSONArray("items")
-                for (i in 0 until responseItems.length()) {
-                    val item = responseItems.getJSONObject(i)
-                    val song = SpotifySong(
-                        uri = item.getString("uri"),
-                        name = item.getString("name"),
-                        artistsUri = item.getJSONArray("artists").let { artists ->
-                            List(artists.length()) { artists.getJSONObject(it).getString("uri") }
-                        },
-                        album = item.getJSONObject("album").getString("name"),
-                        imageUrl = item.getJSONObject("album").getJSONArray("images")
-                            .getJSONObject(0).getString("url"),
-                        popularity = item.getInt("popularity")
-                    )
-                    spotifySongs.add(song)
+            val request = object : JsonObjectRequest(
+                Method.GET,
+                url,
+                null,
+                Response.Listener { response ->
+                    try {
+                        val spotifySongs = mutableListOf<SpotifySong>()
+                        val responseItems = response.getJSONObject("tracks").getJSONArray("items")
+                        for (i in 0 until responseItems.length()) {
+                            val item = responseItems.getJSONObject(i)
+                            val song = SpotifySong(
+                                uri = item.getString("uri"),
+                                name = item.getString("name"),
+                                artistsUri = item.getJSONArray("artists").let { artists ->
+                                    List(artists.length()) {
+                                        artists.getJSONObject(it).getString("uri")
+                                    }
+                                },
+                                album = item.getJSONObject("album").getString("name"),
+                                imageUrl = item.getJSONObject("album").getJSONArray("images")
+                                    .getJSONObject(0).getString("url"),
+                                popularity = item.getInt("popularity")
+                            )
+                            spotifySongs.add(song)
+                        }
+                        continuation.resume(spotifySongs)
+                    } catch (e: JSONException) {
+                        Log.e(DEBUG_TAG, "Error parsing song response: ${e.message}", e)
+                        continuation.resumeWithException(e)
+                    }
+                },
+                Response.ErrorListener { error ->
+                    Log.e(DEBUG_TAG, "Error fetching song: ${error.message}", error)
+                    continuation.resumeWithException(error)
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $accessToken"
+                    return headers
                 }
-                callback(spotifySongs)
-            },
-            Response.ErrorListener { error ->
-                Log.e(DEBUG_TAG, "Error fetching song: ${error.message}", error)
-                callback(emptyList())
-            }) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $accessToken"
-                return headers
             }
-        }
 
-        // Add the request to the request queue
-        Volley.newRequestQueue(applicationContext).add(request)
+            continuation.invokeOnCancellation {
+                request.cancel()
+            }
+
+            Volley.newRequestQueue(applicationContext).add(request)
+        }
     }
 
-    fun createPlaylist(userId: String, playlistName: String, callback: (SpotifyPlaylist?) -> Unit) {
+    suspend fun createPlaylist(userId: String, playlistName: String): SpotifyPlaylist? {
         val url = "https://api.spotify.com/v1/users/$userId/playlists"
         val body = JSONObject().apply {
             put("name", playlistName)
             put("description", "Temporary playlist created by SmartMusicFirst app")
             put("public", false)
         }
-        val request = object : JsonObjectRequest(
-            Method.POST,
-            url,
-            body,
-            Response.Listener { response ->
-                try {
-                    val playlist = SpotifyPlaylist(
-                        uri = response.getString("uri"),
-                        name = response.getString("name"),
-                        imageUrl = response.optJSONArray("images")?.optJSONObject(0)
-                            ?.optString("url", ""),
-                        id = response.getString("id")
-                    )
-                    Log.d(DEBUG_TAG, "Playlist: $playlist")
-                    callback(playlist)
-                } catch (e: JSONException) {
-                    Log.e(DEBUG_TAG, "Error parsing playlist response: ${e.message}", e)
-                    callback(null)
+
+        return withContext(Dispatchers.IO) {
+            suspendCancellableCoroutine { continuation ->
+                val request = object : JsonObjectRequest(
+                    Method.POST,
+                    url,
+                    body,
+                    Response.Listener { response ->
+                        try {
+                            val playlist = SpotifyPlaylist(
+                                uri = response.getString("uri"),
+                                name = response.getString("name"),
+                                imageUrl = response.optJSONArray("images")?.optJSONObject(0)
+                                    ?.optString("url", ""),
+                                id = response.getString("id")
+                            )
+                            Log.d(DEBUG_TAG, "Playlist: $playlist")
+                            continuation.resume(playlist)
+                        } catch (e: JSONException) {
+                            Log.e(DEBUG_TAG, "Error parsing playlist response: ${e.message}", e)
+                            continuation.resumeWithException(e)
+                        }
+                    },
+                    Response.ErrorListener { error ->
+                        Log.e(DEBUG_TAG, "Error creating playlist: ${error.message}", error)
+                        continuation.resumeWithException(error)
+                    }) {
+                    override fun getHeaders(): MutableMap<String, String> {
+                        val headers = HashMap<String, String>()
+                        headers["Authorization"] = "Bearer $accessToken"
+                        headers["Content-Type"] = "application/json"
+                        return headers
+                    }
                 }
-            },
-            Response.ErrorListener { error ->
-                Log.e(DEBUG_TAG, "Error creating playlist: ${error.message}", error)
-                callback(null)
-            }) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $accessToken"
-                headers["Content-Type"] = "application/json"
-                return headers
+
+                continuation.invokeOnCancellation {
+                    request.cancel()
+                }
+
+                Volley.newRequestQueue(applicationContext).add(request)
             }
         }
-
-        // Add the request to the request queue
-        Volley.newRequestQueue(applicationContext).add(request)
     }
 
-    fun addItemsToExistingPlaylist(
+    suspend fun addItemsToExistingPlaylist(
         playlistId: String,
         songUris: List<String>
-    ): CompletableDeferred<Unit> {
-        val deferred = CompletableDeferred<Unit>()
-        val url = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
-        val body = JSONObject().apply {
-            put("uris", JSONArray(songUris))
-        }
-        val request = object : JsonObjectRequest(
-            Method.POST,
-            url,
-            body,
-            Response.Listener { response ->
-                Log.d(DEBUG_TAG, "Items added to playlist: $response")
-                deferred.complete(Unit) // Signal completion
-            },
-            Response.ErrorListener { error ->
-                Log.e(DEBUG_TAG, "Error adding items to playlist: ${error.message}", error)
-                deferred.completeExceptionally(Exception("Error adding items to playlist: ${error.message}"))
-            }) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $accessToken"
-                headers["Content-Type"] = "application/json"
-                return headers
+    ): Unit = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            val url = "https://api.spotify.com/v1/playlists/$playlistId/tracks"
+            val body = JSONObject().apply {
+                put("uris", JSONArray(songUris))
             }
+            val request = object : JsonObjectRequest(
+                Method.POST,
+                url,
+                body,
+                Response.Listener { response ->
+                    Log.d(DEBUG_TAG, "Items added to playlist: $response")
+                    continuation.resume(Unit) // Signal completion
+                },
+                Response.ErrorListener { error ->
+                    Log.e(DEBUG_TAG, "Error adding items to playlist: ${error.message}", error)
+                    continuation.resumeWithException(Exception("Error adding items to playlist: ${error.message}"))
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $accessToken"
+                    headers["Content-Type"] = "application/json"
+                    return headers
+                }
+            }
+
+            continuation.invokeOnCancellation {
+                request.cancel()
+            }
+
+            Volley.newRequestQueue(applicationContext).add(request)
         }
-        Volley.newRequestQueue(applicationContext).add(request)
-        return deferred
     }
 
     private suspend fun getCurrentUserDetails(): SpotifyUser = suspendCoroutine { continuation ->
@@ -283,5 +312,4 @@ object SpotifyWebApi {
             // Add the request to the request queue
             Volley.newRequestQueue(applicationContext).add(request)
         }
-
 }

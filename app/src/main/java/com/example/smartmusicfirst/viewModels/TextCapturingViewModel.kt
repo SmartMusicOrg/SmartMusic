@@ -19,18 +19,19 @@ import com.example.smartmusicfirst.connectors.gemini.GeminiApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
 import com.example.smartmusicfirst.models.KeywordCroticalio
-import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.playPlaylist
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.system.measureTimeMillis
 
 class TextCapturingViewModel(application: Application) : AndroidViewModel(application),
     RecognitionListener {
@@ -50,92 +51,98 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
         _uiState.value = _uiState.value.copy(canUseRecord = false, canUseSubmit = false)
         viewModelScope.launch {
-            try {
-                val firebaseApi = FirebaseApi()
+            val time = measureTimeMillis {
+                try {
+                    val firebaseApi = FirebaseApi()
 
-                // Take the keywords
-                val keywords = getKeywordDeferred(corticalioAccessToken).await()
+                    // Take the keywords
+                    val keywords = getKeywordDeferred(corticalioAccessToken).await()
 
-                // Filter the keywords and get current user preferences
+                    // Filter the keywords and get current user preferences
 
-                // Give Gemini the keywords and extract relevant songs
-                val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
-                Log.d(DEBUG_TAG, "Gemini response: $response")
+                    // Give Gemini the keywords and extract relevant songs
+                    val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
+                    Log.d(DEBUG_TAG, "Gemini response: $response")
 
-                if (response.isEmpty()) {
+                    if (response.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(
+                            canUseRecord = true,
+                            canUseSubmit = true,
+                            errorMessage = "Can not find songs to play. Please try again."
+                        )
+                        return@launch
+                    }
+
+                    // Clean the response of Gemini
+                    val songs = getSongsNamesFromGeminiResponse(response)
+                    Log.d(DEBUG_TAG, "Songs: $songs")
+
+                    // Get the songs from Spotify
+                    val songsList = getSongsList(songs)
+
+
+                    try {
+                        val queryDocRef = withContext(Dispatchers.IO) {
+                            firebaseApi.addDoc(
+                                "users/${SpotifyWebApi.currentUser.id}/queries",
+                                mapOf(
+                                    "isImage" to false,
+                                    "text" to _uiState.value.inputString,
+                                    "keywords" to keywords.joinToString(", ") { it.word },
+                                    "geminiResponse" to response,
+                                    "songs" to songs.joinToString(", ")
+                                )
+                            )
+                        }
+
+                        if (queryDocRef != null) {
+                            songsList.forEach {
+                                withContext(Dispatchers.IO) {
+                                    firebaseApi.addDoc(
+                                        "users/${SpotifyWebApi.currentUser.id}/queries/${queryDocRef.id}/songs",
+                                        mapOf(
+                                            "uri" to it.uri,
+                                            "name" to it.name,
+                                            "artist" to it.album,
+                                            "popularity" to it.popularity
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            Log.e(DEBUG_TAG, "queryDocRef is null")
+                        }
+                    } catch (e: Exception) {
+                        Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
+                    }
+
+
+                    // Create a playlist that will contain all the songs
+                    val playlist = SpotifyWebApi.createPlaylist(
+                        SpotifyWebApi.currentUser.id,
+                        "Smart Music First Playlist"
+                    )
+
+                    // Add the songs to the playlist
+                    val songUris = songsList.map { it.uri }
+                    Log.d(DEBUG_TAG, "Song URIs: $songUris")
+
+                    SpotifyWebApi.addItemsToExistingPlaylist(playlist!!.id, songUris)
+                    Log.d(DEBUG_TAG, "Songs added to playlist")
+
+                    // Play the playlist
+                    playPlaylist(playlist.uri)
+                    //me and my girlfriend having fun together
+                } catch (e: Exception) {
+                    Log.e(DEBUG_TAG, "Error during API calls", e)
                     _uiState.value = _uiState.value.copy(
                         canUseRecord = true,
                         canUseSubmit = true,
-                        errorMessage = "Can not find songs to play. Please try again."
+                        errorMessage = e.message ?: "An error occurred"
                     )
-                    return@launch
                 }
-
-                // Clean the response of Gemini
-                val songs = getSongsNamesFromGeminiResponse(response)
-                Log.d(DEBUG_TAG, "Songs: $songs")
-
-                // Get the songs from Spotify
-                val songsList = getSongsList(songs).await()
-
-
-                try {
-                    val queryDocRef = withContext(Dispatchers.IO) {
-                        firebaseApi.addDoc(
-                            "users/${SpotifyWebApi.currentUser.id}/queries",
-                            mapOf(
-                                "isImage" to false,
-                                "text" to _uiState.value.inputString,
-                                "keywords" to keywords.joinToString(", ") { it.word },
-                                "geminiResponse" to response,
-                                "songs" to songs.joinToString(", ")
-                            )
-                        )
-                    }
-
-                    if (queryDocRef != null) {
-                        songsList.forEach {
-                            withContext(Dispatchers.IO) {
-                                firebaseApi.addDoc(
-                                    "users/${SpotifyWebApi.currentUser.id}/queries/${queryDocRef.id}/songs",
-                                    mapOf(
-                                        "uri" to it.uri,
-                                        "name" to it.name,
-                                        "artist" to it.album,
-                                        "popularity" to it.popularity
-                                    )
-                                )
-                            }
-                        }
-                    } else {
-                        Log.e(DEBUG_TAG, "queryDocRef is null")
-                    }
-                } catch (e: Exception) {
-                    Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
-                }
-
-
-                // Create a playlist that will contain all the songs
-                val playlist = createPlaylist(SpotifyWebApi.currentUser.id).await()
-
-                // Add the songs to the playlist
-                val songUris = songsList.map { it.uri }
-                Log.d(DEBUG_TAG, "Song URIs: $songUris")
-
-                SpotifyWebApi.addItemsToExistingPlaylist(playlist.id, songUris).await()
-                Log.d(DEBUG_TAG, "Songs added to playlist")
-
-                // Play the playlist
-                playPlaylist(playlist.uri)
-                //me and my girlfriend having fun together
-            } catch (e: Exception) {
-                Log.e(DEBUG_TAG, "Error during API calls", e)
-                _uiState.value = _uiState.value.copy(
-                    canUseRecord = true,
-                    canUseSubmit = true,
-                    errorMessage = e.message ?: "An error occurred"
-                )
             }
+            Log.d(DEBUG_TAG, "Time taken: $time ms")
         }
     }
 
@@ -191,52 +198,21 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             }
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Error during parsing Gemini response", e)
-            updateInputString("Can not find songs to play. Please try again.")
+            _uiState.value =
+                _uiState.value.copy(errorMessage = "Can not find songs to play. Please try again.")
         }
         return songs
     }
 
-    private fun getSongsList(songs: List<String>): CompletableDeferred<List<SpotifySong>> {
-        val deferred = CompletableDeferred<List<SpotifySong>>()
-        val songsList = mutableListOf<SpotifySong>()
-
-        viewModelScope.launch {
-            try {
-                val songDeferreds = songs.map { song ->
-                    async {
-                        val songDeferred = CompletableDeferred<SpotifySong>()
-                        SpotifyWebApi.searchForSong(song) { searchResults ->
-                            if (searchResults.isNotEmpty()) {
-                                songDeferred.complete(searchResults[0])
-                            } else {
-                                songDeferred.completeExceptionally(Exception("No songs found for: $song"))
-                            }
-                        }
-                        songDeferred.await()
-                    }
-                }
-
-                val results = songDeferreds.awaitAll()
-                songsList.addAll(results)
-                deferred.complete(songsList)
-            } catch (e: Exception) {
-                deferred.completeExceptionally(e)
+    private suspend fun getSongsList(songs: List<String>): List<SpotifySong> = coroutineScope {
+        val songsList = songs.map { songName ->
+            async {
+                SpotifyWebApi.searchForSong(songName)[0]
             }
         }
-
-        return deferred
+        songsList.awaitAll()
     }
 
-    private fun createPlaylist(userId: String): CompletableDeferred<SpotifyPlaylist> {
-        val deferred = CompletableDeferred<SpotifyPlaylist>()
-        val playlistName = "Smart Music First Playlist"
-        SpotifyWebApi.createPlaylist(userId, playlistName) { playlist ->
-            if (playlist != null) {
-                deferred.complete(playlist)
-            }
-        }
-        return deferred
-    }
 
     fun speechToTextButtonClicked() {
         if (_uiState.value.isListening) {
