@@ -14,17 +14,17 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.DEBUG_TAG
+import com.example.smartmusicfirst.connectors.ai.AIApi
+import com.example.smartmusicfirst.connectors.ai.GeminiApi
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
 import com.example.smartmusicfirst.connectors.datastore.DataStorePreferences
 import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
-import com.example.smartmusicfirst.connectors.gemini.GeminiApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.LoadingHintsEnum
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
 import com.example.smartmusicfirst.models.KeywordCroticalio
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.playPlaylist
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -43,15 +43,23 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
     val uiState: StateFlow<TextCapturingUiState> = _uiState.asStateFlow()
     private var recognizer = SpeechRecognizer.createSpeechRecognizer(application)
 
+    /**
+     * Update the input string in the UI
+     * @param str The new input string
+     */
     fun updateInputString(str: String) {
         _uiState.value = _uiState.value.copy(inputString = str)
     }
 
+    /**
+     * Enable the recording button
+     * @param isAvailable True if the recording is available
+     */
     fun enableRecording(isAvailable: Boolean) {
         _uiState.value = _uiState.value.copy(recordingGranted = isAvailable)
     }
 
-    fun searchSong(corticalioAccessToken: String, geminiApiKey: String) {
+    fun searchSong(corticalioAccessToken: String, aiApiKey: String, aiModel: AIApi = GeminiApi) {
         _uiState.value =
             _uiState.value.copy(canUseRecord = false, canUseSubmit = false, isLoading = true)
         viewModelScope.launch {
@@ -60,15 +68,20 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.KEYWORD_EXTRACT.hintState)
                     // Take the keywords
-                    val keywords = getKeywordDeferred(corticalioAccessToken).await()
+                    val keywords = CroticalioApi.findKeyWords(
+                        corticalioAccessToken,
+                        _uiState.value.inputString
+                    )
 
                     // Filter the keywords and get current user preferences
 
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.GET_AI_OFFER.hintState)
                     // Give Gemini the keywords and extract relevant songs
-                    val response = getGeminiResponseDeferred(geminiApiKey, keywords).await()
-                    Log.d(DEBUG_TAG, "Gemini response: $response")
+                    val query = buildQuery(keywords)
+
+                    val response = aiModel.getResponse(query, aiApiKey)
+                    Log.d(DEBUG_TAG, "Ai response: $response")
 
                     if (response.isEmpty()) {
                         _uiState.value = _uiState.value.copy(
@@ -82,7 +95,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.SONGS_EXTRACT.hintState)
                     // Clean the response of Gemini
-                    val songs = getSongsNamesFromGeminiResponse(response)
+                    val songs = getSongsNamesFromAiResponse(response)
                     Log.d(DEBUG_TAG, "Songs: $songs")
 
                     // Get the songs from Spotify
@@ -179,45 +192,23 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    private fun getKeywordDeferred(accessToken: String): CompletableDeferred<List<KeywordCroticalio>> {
-        val deferred = CompletableDeferred<List<KeywordCroticalio>>()
-
-        CroticalioApi.findKeyWords(
-            accessToken = accessToken,
-            searchQuery = _uiState.value.inputString,
-            callback = { keywords ->
-                deferred.complete(keywords)
-            },
-            errorCallback = { error ->
-                deferred.completeExceptionally(error)
-            }
-        )
-
-        return deferred
-    }
-
-    private fun getGeminiResponseDeferred(
-        apiKey: String,
-        listOfKeywords: List<KeywordCroticalio>
-    ): CompletableDeferred<String> {
-        val deferred = CompletableDeferred<String>()
-        val keywordsTemplate = listOfKeywords.joinToString(" ") { it.word }
+    /**
+     * Build the query for the AI model
+     * @param keywords The keywords to use
+     * @return The query
+     */
+    private fun buildQuery(keywords: List<KeywordCroticalio>): String {
+        val keywordsTemplate = keywords.joinToString(" ") { it.word }
         Log.d(DEBUG_TAG, "Keywords template: $keywordsTemplate")
-        val inputQuery =
-            "give me list of top fifteen popular songs that connected to the following words: $keywordsTemplate give only the list without any other world accept the list"
-
-        viewModelScope.launch {
-            try {
-                val response = GeminiApi.getGeminiResponse(inputQuery, apiKey)
-                deferred.complete(response)
-            } catch (e: Exception) {
-                deferred.completeExceptionally(e)
-            }
-        }
-        return deferred
+        return "give me list of top fifteen popular songs that connected to the following words: $keywordsTemplate give only the list without any other world accept the list"
     }
 
-    private fun getSongsNamesFromGeminiResponse(response: String): List<String> {
+    /**
+     * Get the songs names from the AI response
+     * @param response The response from the AI model
+     * @return The list of songs
+     */
+    private fun getSongsNamesFromAiResponse(response: String): List<String> {
         val songs = mutableListOf<String>()
         try {
             val rows = response.split("\n")
@@ -230,7 +221,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 }
             }
         } catch (e: Exception) {
-            Log.e(DEBUG_TAG, "Error during parsing Gemini response", e)
+            Log.e(DEBUG_TAG, "Error during parsing AI response", e)
             _uiState.value =
                 _uiState.value.copy(errorMessage = "Can not find songs to play. Please try again.")
         }
@@ -291,7 +282,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             Log.d(DEBUG_TAG, "stopListening called but recognizer is not listening")
         }
     }
-
 
     override fun onReadyForSpeech(p0: Bundle?) {
     }

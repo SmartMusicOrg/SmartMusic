@@ -1,12 +1,13 @@
-package com.example.smartmusicfirst.connectors.gemini
+package com.example.smartmusicfirst.connectors.ai
 
 import android.util.Log
 import com.example.smartmusicfirst.DEBUG_TAG
 import com.google.ai.client.generativeai.GenerativeModel
 
 
-object GeminiApi {
-    suspend fun getGeminiResponse(inputQuery: String, apiKey: String): String {
+object GeminiApi: AIApi{
+
+    override suspend fun getResponse(inputQuery: String, apiKey: String): String {
         var res = ""
         val generativeModel = GenerativeModel(
             modelName = "gemini-1.5-flash",
