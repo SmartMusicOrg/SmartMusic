@@ -96,7 +96,7 @@ object SpotifyWebApi {
     suspend fun searchForSong(songName: String): List<SpotifySong> = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { continuation ->
             val encodedSongName = URLEncoder.encode(songName, "UTF-8")
-            val url = "https://api.spotify.com/v1/search?q=$encodedSongName&type=track&limit=5"
+            val url = "https://api.spotify.com/v1/search?q=$encodedSongName&type=track&limit=1"
 
             val request = object : JsonObjectRequest(
                 Method.GET,

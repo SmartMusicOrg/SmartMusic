@@ -15,16 +15,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
+import com.example.smartmusicfirst.connectors.ai.ChatGptApi
+import com.example.smartmusicfirst.ui.components.LoadingPage
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 import com.example.smartmusicfirst.viewModels.ImageCapturingViewModel
 import java.io.File
@@ -54,6 +52,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Properties
 
 @Composable
 fun ImageCapturingScreen(
@@ -124,66 +123,63 @@ fun ImageCapturingScreen(
             cameraLauncher.launch(uri)
         }
     }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.padding_large),
-                vertical = dimensionResource(id = R.dimen.padding_extra_large)
-            )
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontSize = 32.sp,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
-        )
-
-
-
-        uiState.value.imageBitmap?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(0.9f)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        } ?: run {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(0.8f)
-                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.add_a_photo), // Use your placeholder vector drawable here
-                    contentDescription = "Placeholder",
-                    modifier = Modifier.size(128.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_large),
+                    vertical = dimensionResource(id = R.dimen.padding_extra_large)
                 )
-            }
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
             Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.secondary,
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontSize = 32.sp,
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
             )
-        }
 
-        Row(modifier = Modifier.fillMaxWidth(0.8f)) {
+
+
+            uiState.value.imageBitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(0.9f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            } ?: run {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(0.8f)
+                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.add_a_photo), // Use your placeholder vector drawable here
+                        contentDescription = "Placeholder",
+                        modifier = Modifier.size(128.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_medium))
+                )
+            }
+
             Button(
                 onClick = { ensurePermissionsAndCaptureImage() },
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .weight(1f)
+                modifier = Modifier.fillMaxWidth(0.8f)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.photo_camera), // Use your camera vector drawable here
@@ -197,12 +193,11 @@ fun ImageCapturingScreen(
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
+
             Button(
                 onClick = { galleryLauncher.launch("image/*") },
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .weight(1f)
+                modifier = Modifier.fillMaxWidth(0.8f)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.gallery), // Use your gallery vector drawable here
@@ -216,17 +211,30 @@ fun ImageCapturingScreen(
                     modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_small))
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_small)))
 
-        Button(onClick = { imageCapturingViewModel.searchSong() }, modifier = Modifier.fillMaxWidth(0.8f)) {
-            Image(
-                painter = painterResource(id = R.drawable.search), // Use your search vector drawable here
-                contentDescription = "Search",
-                modifier = Modifier.size(32.dp),
-                colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
-            )
-            Text(text = stringResource(id = R.string.search), color = Color.White)
+            Button(
+                enabled = uiState.value.canUseSubmit,
+                onClick = {
+                    val properties =
+                        Properties().apply { load(context.resources.openRawResource(R.raw.gemini)) }
+                    imageCapturingViewModel.searchSong(
+                        aiApiKey = properties.getProperty("chat_gpt_access_token") ?: "",
+                        aiModel = ChatGptApi
+                    )
+                }, modifier = Modifier.fillMaxWidth(0.8f)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.search), // Use your search vector drawable here
+                    contentDescription = "Search",
+                    modifier = Modifier.size(32.dp),
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
+                )
+                Text(text = stringResource(id = R.string.search), color = Color.White)
+            }
+        }
+        if(uiState.value.isLoading) {
+            LoadingPage(hint = uiState.value.userHint)
         }
     }
 }

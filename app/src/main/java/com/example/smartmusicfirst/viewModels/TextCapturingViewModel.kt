@@ -108,7 +108,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                                         "isImage" to false,
                                         "text" to _uiState.value.inputString,
                                         "keywords" to keywords.joinToString(", ") { it.word },
-                                        "geminiResponse" to response,
+                                        "aiResponse" to response,
                                         "songs" to songs.joinToString(", ")
                                     )
                                 )

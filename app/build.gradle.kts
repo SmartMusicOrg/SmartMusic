@@ -91,11 +91,12 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("com.google.mlkit:image-labeling:17.0.8")
+    implementation("com.google.firebase:firebase-storage")
 
     testImplementation("junit:junit:4.13.2")
 
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 

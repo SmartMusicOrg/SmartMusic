@@ -18,6 +18,7 @@ object GeminiApi : AIApi {
             res = response.text ?: ""
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Error getting response: ${e.message}", e)
+            throw e
         }
         return res
     }

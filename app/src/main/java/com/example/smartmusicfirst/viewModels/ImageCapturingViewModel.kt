@@ -4,10 +4,18 @@ import android.app.Application
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smartmusicfirst.DEBUG_TAG
+import com.example.smartmusicfirst.connectors.ai.AIApi
+import com.example.smartmusicfirst.connectors.ai.GeminiApi
+import com.example.smartmusicfirst.connectors.datastore.DataStorePreferences
+import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
+import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
+import com.example.smartmusicfirst.data.LoadingHintsEnum
 import com.example.smartmusicfirst.data.uiStates.ImageCapturingUiState
+import com.example.smartmusicfirst.playPlaylist
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
@@ -41,7 +49,7 @@ class ImageCapturingViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
-    fun searchSong() {
+    fun searchSong(aiApiKey: String, aiModel: AIApi = GeminiApi) {
         _uiState.value =
             _uiState.value.copy(canUseSubmit = false, isLoading = true)
         viewModelScope.launch {
@@ -84,6 +92,109 @@ class ImageCapturingViewModel(application: Application) : AndroidViewModel(appli
                     for (label in labels) {
                         Log.d(DEBUG_TAG, "Label: $label")
                     }
+
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.GET_AI_OFFER.hintState)
+                    // Give AI the keywords and extract relevant songs
+                    val query = aiModel.buildQuery(labels)
+
+                    val response = aiModel.getResponse(query, aiApiKey)
+                    Log.d(DEBUG_TAG, "Ai response: $response")
+
+                    if (response.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(
+                            canUseSubmit = true,
+                            toastMessage = "Can not find songs to play. Please try again."
+                        )
+                        return@launch
+                    }
+
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.SONGS_EXTRACT.hintState)
+                    // Clean the response of Gemini
+                    val songs = aiModel.getSongsNamesFromAiResponse(response)
+                    Log.d(DEBUG_TAG, "Songs: $songs")
+
+                    // Get the songs from Spotify
+                    val songsList = SpotifyWebApi.getSongsList(songs)
+
+                    _uiState.value =
+                        _uiState.value.copy(userHint = LoadingHintsEnum.BUILD_PLAYLIST.hintState)
+
+                    launch {
+                        try {
+                            val firebaseApi = FirebaseApi()
+                            val str = firebaseApi.uploadImage(_uiState.value.imageUri!!)
+                            Log.d(DEBUG_TAG, "Image uploaded to Firebase: $str")
+                            val queryDocRef = withContext(Dispatchers.IO) {
+                                firebaseApi.addDoc(
+                                    "users/${SpotifyWebApi.currentUser.id}/queries",
+                                    mapOf(
+                                        "isImage" to true,
+                                        "imageUri" to str,
+                                        "keywords" to labels.joinToString(", "),
+                                        "aiResponse" to response,
+                                        "songs" to songs.joinToString(", ")
+                                    )
+                                )
+                            }
+                            if (queryDocRef != null) {
+                                songsList.forEach {
+                                    withContext(Dispatchers.IO) {
+                                        firebaseApi.addDoc(
+                                            "users/${SpotifyWebApi.currentUser.id}/queries/${queryDocRef.id}/songs",
+                                            mapOf(
+                                                "uri" to it.uri,
+                                                "name" to it.name,
+                                                "artist" to it.album,
+                                                "popularity" to it.popularity
+                                            )
+                                        )
+                                    }
+                                }
+                            } else {
+                                Log.e(DEBUG_TAG, "queryDocRef is null")
+                            }
+                        } catch (e: Exception) {
+                            Log.e(DEBUG_TAG, "Error during saving query to Firebase", e)
+                        }
+                    }
+
+                    DataStorePreferences.readData(app, stringPreferencesKey("lastPlaylistUri"))
+                        .let {
+                            if (it.isNotEmpty()) {
+                                try {
+                                    SpotifyWebApi.unfollowPlaylist(it)
+                                } catch (e: Exception) {
+                                    Log.e(DEBUG_TAG, "some error during unfollowing", e)
+                                }
+                            }
+                        }
+                    // Create a playlist that will contain all the songs
+                    val playlist = SpotifyWebApi.createPlaylist(
+                        SpotifyWebApi.currentUser.id,
+                        "Smart Music First Playlist"
+                    )
+
+                    DataStorePreferences.saveData(
+                        app,
+                        stringPreferencesKey("lastPlaylistUri"),
+                        playlist!!.id
+                    )
+
+                    // Add the songs to the playlist
+                    val songUris = songsList.map { it.uri }
+                    Log.d(DEBUG_TAG, "Song URIs: $songUris")
+
+                    SpotifyWebApi.addItemsToExistingPlaylist(playlist.id, songUris)
+                    Log.d(DEBUG_TAG, "Songs added to playlist")
+
+                    // Play the playlist
+                    playPlaylist(playlist.uri)
+                    _uiState.value = _uiState.value.copy(
+                        canUseSubmit = true,
+                        isLoading = false
+                    )
 
 
                 } catch (e: Exception) {

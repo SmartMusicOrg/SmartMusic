@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
+import com.example.smartmusicfirst.ui.components.LoadingPage
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 import com.example.smartmusicfirst.viewModels.TextCapturingViewModel
 import java.util.Properties
@@ -146,19 +146,7 @@ fun TextCapturingScreen(
             }
         }
         if (uiState.isLoading) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
-            ) {
-                CircularProgressIndicator()
-                Text(
-                    text = stringResource(id = uiState.userHint),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            LoadingPage(hint = uiState.userHint)
         }
     }
 }

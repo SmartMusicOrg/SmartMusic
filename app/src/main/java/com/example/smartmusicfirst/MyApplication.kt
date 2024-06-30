@@ -1,6 +1,7 @@
 package com.example.smartmusicfirst
 
 import android.app.Application
+import com.example.smartmusicfirst.connectors.ai.ChatGptApi
 import com.example.smartmusicfirst.connectors.croticalio.CroticalioApi
 
 class MyApplication : Application() {
@@ -8,5 +9,6 @@ class MyApplication : Application() {
         super.onCreate()
         // Initialize the APIs with the application context
         CroticalioApi.init(this)
+        ChatGptApi.init(this)
     }
 }

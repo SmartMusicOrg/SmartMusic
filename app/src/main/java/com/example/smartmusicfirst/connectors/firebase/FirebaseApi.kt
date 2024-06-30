@@ -1,12 +1,15 @@
 package com.example.smartmusicfirst.connectors.firebase
 
+import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.tasks.await
 
 class FirebaseApi {
     private val database = Firebase.firestore
+    private val storage = Firebase.storage
 
     fun getDocs(collectionName: String): List<Map<String, Any?>> {
         val items = mutableListOf<Map<String, Any>>()
@@ -84,6 +87,16 @@ class FirebaseApi {
         return try {
             val docRef = database.collection(collectionName).add(item).await()
             docRef
+        } catch (exception: Exception) {
+            throw exception
+        }
+    }
+
+    suspend fun uploadImage(imageUri: Uri): String {
+        return try {
+            val storageRef = storage.reference.child("images/${imageUri.lastPathSegment} ")
+            storageRef.putFile(imageUri).await()
+            storageRef.downloadUrl.await().toString()
         } catch (exception: Exception) {
             throw exception
         }
