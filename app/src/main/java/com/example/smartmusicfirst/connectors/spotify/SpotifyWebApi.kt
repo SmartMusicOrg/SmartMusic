@@ -14,6 +14,9 @@ import com.example.smartmusicfirst.models.SpotifyPlaylist
 import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.models.SpotifyUser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -312,6 +315,15 @@ object SpotifyWebApi {
 
             Volley.newRequestQueue(applicationContext).add(request)
         }
+    }
+
+    suspend fun getSongsList(songs: List<String>): List<SpotifySong> = coroutineScope {
+        val songsList = songs.map { songName ->
+            async {
+                searchForSong(songName)[0]
+            }
+        }
+        songsList.awaitAll()
     }
 
     private suspend fun getCurrentUserDetails(): SpotifyUser = suspendCoroutine { continuation ->

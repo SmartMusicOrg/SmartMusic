@@ -22,13 +22,8 @@ import com.example.smartmusicfirst.connectors.firebase.FirebaseApi
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.LoadingHintsEnum
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
-import com.example.smartmusicfirst.models.KeywordCroticalio
-import com.example.smartmusicfirst.models.SpotifySong
 import com.example.smartmusicfirst.playPlaylist
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,8 +72,8 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
 
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.GET_AI_OFFER.hintState)
-                    // Give Gemini the keywords and extract relevant songs
-                    val query = buildQuery(keywords)
+                    // Give AI the keywords and extract relevant songs
+                    val query = aiModel.buildQuery(keywords.map { it.word })
 
                     val response = aiModel.getResponse(query, aiApiKey)
                     Log.d(DEBUG_TAG, "Ai response: $response")
@@ -95,11 +90,11 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.SONGS_EXTRACT.hintState)
                     // Clean the response of Gemini
-                    val songs = getSongsNamesFromAiResponse(response)
+                    val songs = aiModel.getSongsNamesFromAiResponse(response)
                     Log.d(DEBUG_TAG, "Songs: $songs")
 
                     // Get the songs from Spotify
-                    val songsList = getSongsList(songs)
+                    val songsList = SpotifyWebApi.getSongsList(songs)
 
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.BUILD_PLAYLIST.hintState)
@@ -190,51 +185,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             }
             Log.d(DEBUG_TAG, "Time taken: $time ms")
         }
-    }
-
-    /**
-     * Build the query for the AI model
-     * @param keywords The keywords to use
-     * @return The query
-     */
-    private fun buildQuery(keywords: List<KeywordCroticalio>): String {
-        val keywordsTemplate = keywords.joinToString(" ") { it.word }
-        Log.d(DEBUG_TAG, "Keywords template: $keywordsTemplate")
-        return "give me list of top fifteen popular songs that connected to the following words: $keywordsTemplate give only the list without any other world accept the list"
-    }
-
-    /**
-     * Get the songs names from the AI response
-     * @param response The response from the AI model
-     * @return The list of songs
-     */
-    private fun getSongsNamesFromAiResponse(response: String): List<String> {
-        val songs = mutableListOf<String>()
-        try {
-            val rows = response.split("\n")
-            for (row in rows) {
-                if (row.isNotEmpty()) {
-                    row.replace("\"", "")
-                    row.subSequence(2, row.length).toString().let {
-                        songs.add(it)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(DEBUG_TAG, "Error during parsing AI response", e)
-            _uiState.value =
-                _uiState.value.copy(errorMessage = "Can not find songs to play. Please try again.")
-        }
-        return songs
-    }
-
-    private suspend fun getSongsList(songs: List<String>): List<SpotifySong> = coroutineScope {
-        val songsList = songs.map { songName ->
-            async {
-                SpotifyWebApi.searchForSong(songName)[0]
-            }
-        }
-        songsList.awaitAll()
     }
 
     fun speechToTextButtonClicked() {
