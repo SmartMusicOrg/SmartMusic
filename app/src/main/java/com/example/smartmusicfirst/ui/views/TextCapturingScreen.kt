@@ -139,7 +139,7 @@ fun TextCapturingScreen(
                     .height(dimensionResource(id = R.dimen.height_large)),
             ) {
                 Text(
-                    text = "Search",
+                    text = stringResource(id = R.string.search),
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White
                 )
