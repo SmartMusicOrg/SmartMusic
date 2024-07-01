@@ -30,6 +30,9 @@ class LogInActivity : ComponentActivity(), SpotifyAuthConnectionListener {
     }
 
     private fun onLoginButtonClick() {
+        setContent {
+            LogInScreen(::onLoginButtonClick, isLoading = true)
+        }
         SpotifyAuthConnection.initAuthConnection(this, this, spotifyAuthLauncher)
     }
 

@@ -27,9 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.smartmusicfirst.R
+import com.example.smartmusicfirst.ui.components.LoadingPage
 
 @Composable
-fun LogInScreen(onLoginClick: () -> Unit, errorMessage: String? = null) {
+fun LogInScreen(
+    onLoginClick: () -> Unit,
+    errorMessage: String? = null,
+    isLoading: Boolean = false
+) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -106,6 +111,9 @@ fun LogInScreen(onLoginClick: () -> Unit, errorMessage: String? = null) {
                         )
                     }
                 }
+            }
+            if (isLoading) {
+                LoadingPage(hint = R.string.loading)
             }
         }
     }
