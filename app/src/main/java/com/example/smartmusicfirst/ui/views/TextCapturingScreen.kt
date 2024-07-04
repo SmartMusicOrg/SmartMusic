@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
+import com.example.smartmusicfirst.connectors.ai.ChatGptApi
 import com.example.smartmusicfirst.ui.components.LoadingPage
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
 import com.example.smartmusicfirst.viewModels.TextCapturingViewModel
@@ -131,8 +132,8 @@ fun TextCapturingScreen(
                     val corticalioAccessToken =
                         properties.getProperty("croticalio_access_token") ?: ""
                     properties.load(context.resources.openRawResource(R.raw.gemini))
-                    val geminiApiKey = properties.getProperty("gemini_api_key") ?: ""
-                    textCapturingViewModel.searchSong(corticalioAccessToken, geminiApiKey)
+                    val aiApiKey = properties.getProperty("chat_gpt_access_token") ?: ""
+                    textCapturingViewModel.searchSong(corticalioAccessToken, aiApiKey, ChatGptApi)
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
