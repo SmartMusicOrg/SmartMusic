@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.example.smartmusicfirst.broadcastReceivers.PhotoReceiver
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
 import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
 import com.example.smartmusicfirst.ui.views.SmartMusicScreen
@@ -17,6 +18,7 @@ const val DEBUG_TAG = "Debug"
 
 class MainActivity : ComponentActivity(), SpotifyConnectionListener {
 
+    private lateinit var receiver: PhotoReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +35,8 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener {
             }
         }
         SpotifyConnection.connect(this, this)
+        receiver = PhotoReceiver()
+        receiver.registerContentObserver(this)
     }
 
     override fun onStart() {
@@ -52,6 +56,7 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener {
         // Pause the music before disconnecting
         SpotifyConnection.getPlayerApi()?.pause()
         SpotifyConnection.disconnect()
+        receiver.unregisterContentObserver(this)
     }
 
     override fun onSpotifyConnected() {
