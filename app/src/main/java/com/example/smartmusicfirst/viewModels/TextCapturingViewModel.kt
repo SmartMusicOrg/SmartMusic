@@ -23,11 +23,16 @@ import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.LoadingHintsEnum
 import com.example.smartmusicfirst.data.uiStates.TextCapturingUiState
 import com.example.smartmusicfirst.playPlaylist
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
@@ -62,11 +67,24 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 try {
                     _uiState.value =
                         _uiState.value.copy(userHint = LoadingHintsEnum.KEYWORD_EXTRACT.hintState)
+                    // ML-Kit turns hebrew to english if the text is in hebrew:
+                    translateText(_uiState.value.inputString)
+
                     // Take the keywords
                     val keywords = CroticalioApi.findKeyWords(
                         corticalioAccessToken,
                         _uiState.value.inputString
                     )
+
+                    if (keywords.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(
+                            canUseRecord = true,
+                            canUseSubmit = true,
+                            isLoading = false,
+                            errorMessage = "Can not find keywords. Please try again."
+                        )
+                        return@launch
+                    }
 
                     // Filter the keywords and get current user preferences
 
@@ -192,6 +210,29 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
             stopListening()
         } else {
             startListening(Locale.current.language)
+        }
+    }
+
+    private suspend fun translateText(
+        text: String
+    ) {
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(TranslateLanguage.HEBREW)
+            .setTargetLanguage(TranslateLanguage.ENGLISH)
+            .build()
+        val translator = Translation.getClient(options)
+
+        val conditions = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+        val download = translator.downloadModelIfNeeded(conditions)
+        download.await()
+        if (download.isSuccessful) {
+            val result = translator.translate(text).await()
+            Log.d(DEBUG_TAG, "Translated text: $result")
+            updateInputString(result)
+        } else {
+            Log.e(DEBUG_TAG, "Error during translation")
         }
     }
 
