@@ -57,6 +57,7 @@ import java.util.Properties
 @Composable
 fun ImageCapturingScreen(
     modifier: Modifier = Modifier,
+    onNavigateToPlayerPage: () -> Unit = {},
     title: String = "Capture Image",
     message: String = "Tap a button below to capture an image or select from gallery.",
     imageCapturingViewModel: ImageCapturingViewModel = viewModel()
@@ -220,7 +221,8 @@ fun ImageCapturingScreen(
                         Properties().apply { load(context.resources.openRawResource(R.raw.gemini)) }
                     imageCapturingViewModel.searchSong(
                         aiApiKey = properties.getProperty("chat_gpt_access_token") ?: "",
-                        aiModel = ChatGptApi
+                        aiModel = ChatGptApi,
+                        onNavigateToPlayerPage = onNavigateToPlayerPage
                     )
                 }, modifier = Modifier.fillMaxWidth(0.8f)
             ) {
@@ -233,7 +235,7 @@ fun ImageCapturingScreen(
                 Text(text = stringResource(id = R.string.search), color = Color.White)
             }
         }
-        if(uiState.value.isLoading) {
+        if (uiState.value.isLoading) {
             LoadingPage(hint = uiState.value.userHint)
         }
     }

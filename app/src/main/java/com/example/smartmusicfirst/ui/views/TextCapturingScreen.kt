@@ -48,6 +48,7 @@ import java.util.Properties
 
 @Composable
 fun TextCapturingScreen(
+    onNavigateToPlayerPage: () -> Unit,
     modifier: Modifier = Modifier,
     textCapturingViewModel: TextCapturingViewModel = viewModel()
 ) {
@@ -133,7 +134,11 @@ fun TextCapturingScreen(
                         properties.getProperty("croticalio_access_token") ?: ""
                     properties.load(context.resources.openRawResource(R.raw.gemini))
                     val aiApiKey = properties.getProperty("chat_gpt_access_token") ?: ""
-                    textCapturingViewModel.searchSong(corticalioAccessToken, aiApiKey, ChatGptApi)
+                    textCapturingViewModel.searchSong(
+                        corticalioAccessToken,
+                        aiApiKey,
+                        ChatGptApi
+                    ) { onNavigateToPlayerPage() }
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
@@ -156,7 +161,7 @@ fun TextCapturingScreen(
 @Composable
 fun SongSearchScreenPreview() {
     SmartMusicFirstTheme {
-        TextCapturingScreen()
+        TextCapturingScreen({})
     }
 }
 
@@ -164,6 +169,6 @@ fun SongSearchScreenPreview() {
 @Composable
 fun SongSearchScreenDarkPreview() {
     SmartMusicFirstTheme(darkTheme = true) {
-        TextCapturingScreen()
+        TextCapturingScreen({})
     }
 }

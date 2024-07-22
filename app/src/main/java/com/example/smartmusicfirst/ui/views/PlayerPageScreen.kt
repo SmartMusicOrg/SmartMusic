@@ -10,18 +10,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -29,69 +30,71 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.smartmusicfirst.R
-import com.example.smartmusicfirst.models.SpotifySong
-import com.example.smartmusicfirst.playSong
+import com.example.smartmusicfirst.connectors.spotify.SpotifyConnection
 import com.example.smartmusicfirst.ui.theme.SmartMusicFirstTheme
+import com.example.smartmusicfirst.viewModels.PlayerPageViewModel
 
 @Composable
-fun PlayerPageScreen(songPlaylist: List<SpotifySong>, modifier: Modifier = Modifier) {
+fun PlayerPageScreen(
+    modifier: Modifier = Modifier,
+    playerPageViewModel: PlayerPageViewModel = viewModel()
+) {
+    val uiState by playerPageViewModel.uiState.collectAsState()
     Box(
         modifier = modifier
             .background(color = MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.BottomCenter
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.Top,
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(songPlaylist.size) { index ->
-                SpotifySongItemView(songPlaylist[index])
-                HorizontalDivider()
-            }
-        }
-        Column {
-            PlayerControllerView()
+            Text(
+                text = "Enjoy your music!",
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center)
+            )
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_medium)))
+            Image(
+                painter = painterResource(id = R.drawable.logo_app),
+                contentDescription = "music",
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.onBackground)
+                    .padding(dimensionResource(id = R.dimen.padding_extra_large))
+                    .size(200.dp)
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_medium)))
+            PlayerControllerView(
+                isPlaying = uiState.isPlaying,
+                playToggle = { playerPageViewModel.togglePlay() },
+                isPremium = playerPageViewModel.isUserPremium()
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_medium)))
+            if (!playerPageViewModel.isUserPremium())
+                Text(
+                    text = "Upgrade to premium to unlock more features!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.Center)
+                )
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.height_medium)))
         }
     }
 }
 
 @Composable
-fun SpotifySongItemView(spotifySong: SpotifySong) {
-    ListItem(
-        leadingContent = {
-            Image(
-                painter = painterResource(id = R.drawable.music_note),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.height_medium))
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = MaterialTheme.shapes.extraSmall
-                    )
-            )
-        },
-        headlineContent = {
-            Text(text = spotifySong.name)
-        },
-        supportingContent = {
-            Text(text = spotifySong.artistsUri?.joinToString(", ") ?: "")
-        },
-        tonalElevation = if (spotifySong.selected) dimensionResource(id = R.dimen.height_extra_large) else dimensionResource(
-            id = R.dimen.elevation_small
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { playSong(spotifySong.uri) }
-    )
-}
-
-//@OptIn(ExperimentalCoilApi::class)
-@Composable
-fun PlayerControllerView() {
+fun PlayerControllerView(
+    isPlaying: Boolean = true,
+    playToggle: () -> Unit = {},
+    isPremium: Boolean = false
+) {
     Card(
         elevation = CardDefaults.elevatedCardElevation(),
         modifier = Modifier
@@ -103,31 +106,41 @@ fun PlayerControllerView() {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
-            ButtonControllerView(icon = R.drawable.skip_previous) {/*TODO: skip previous*/ }
-            ButtonControllerView(icon = R.drawable.play) {/*TODO: play/pause*/ }
-            ButtonControllerView(icon = R.drawable.skip_next) {/*TODO: skip next*/ }
+            ButtonControllerView(icon = R.drawable.skip_previous, enabled = isPremium) {
+                SpotifyConnection.getPlayerApi()!!.skipPrevious()
+            }
+            ButtonControllerView(icon = if (isPlaying) R.drawable.pause else R.drawable.play) { playToggle() }
+            ButtonControllerView(icon = R.drawable.skip_next, enabled = isPremium) {
+                SpotifyConnection.getPlayerApi()!!.skipNext()
+            }
         }
     }
 }
 
 @Composable
-fun ButtonControllerView(@DrawableRes icon: Int, onClick: () -> Unit) {
+fun ButtonControllerView(
+    @DrawableRes icon: Int,
+    enabled: Boolean = true,
+    onClick: () -> Unit = { },
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(dimensionResource(id = R.dimen.height_large))
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainer,
+                color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                    alpha = 0.5f
+                ),
                 shape = MaterialTheme.shapes.extraLarge
             )
-            .clickable { onClick() }
+            .clickable(enabled = enabled, onClick = onClick)
     ) {
         Image(
             painter = painterResource(id = icon),
-            contentDescription = "previous song",
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
+            contentDescription = "playback control button",
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
             modifier = Modifier
                 .size(dimensionResource(id = R.dimen.height_medium))
 
@@ -142,91 +155,6 @@ fun ButtonControllerView(@DrawableRes icon: Int, onClick: () -> Unit) {
 fun PlayerPageScreenPreview() {
     SmartMusicFirstTheme {
         PlayerPageScreen(
-            songPlaylist = listOf(
-                SpotifySong(
-                    uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
-                    name = "Good Mood - Original Song From Paw Patrol: The Movie",
-                    artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
-                    album = "Good Mood (Original Song From Paw Patrol: The Movie)",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),
-                SpotifySong(
-                    uri = "spotify:album:0KeNJa8ky2LAuzKjUqz6EK",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c",
-                    selected = true
-                ),
-                SpotifySong(
-                    uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),
-                SpotifySong(
-                    uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
-                    name = "Good Mood - Original Song From Paw Patrol: The Movie",
-                    artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
-                    album = "Good Mood (Original Song From Paw Patrol: The Movie)",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),
-                SpotifySong(
-                    uri = "spotify:album:0KeNJa8ky2LAuzKjUqz6EK",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c"
-                ),
-                SpotifySong(
-                    uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ), SpotifySong(
-                    uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
-                    name = "Good Mood - Original Song From Paw Patrol: The Movie",
-                    artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
-                    album = "Good Mood (Original Song From Paw Patrol: The Movie)",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),
-                SpotifySong(
-                    uri = "spotify:album:0KeNJa8ky2LAuzKjUqz6EK",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c"
-                ),
-                SpotifySong(
-                    uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ), SpotifySong(
-                    uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
-                    name = "Good Mood - Original Song From Paw Patrol: The Movie",
-                    artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
-                    album = "Good Mood (Original Song From Paw Patrol: The Movie)",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),
-                SpotifySong(
-                    uri = "spotify:album:0KeNJa8ky2LAuzKjUqz6EK",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c"
-                ),
-                SpotifySong(
-                    uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                )
-            ),
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -237,30 +165,6 @@ fun PlayerPageScreenPreview() {
 fun PlayerPageScreenDarkPreview() {
     SmartMusicFirstTheme(darkTheme = true) {
         PlayerPageScreen(
-            songPlaylist = listOf(
-                SpotifySong(
-                    uri = "spotify:track:4uX1pkSuSidzJxT4eWL7x1",
-                    name = "Good Mood - Original Song From Paw Patrol: The Movie",
-                    artistsUri = listOf("spotify:artist:4bYPcJP5jwMhSivRcqie2n"),
-                    album = "Good Mood (Original Song From Paw Patrol: The Movie)",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                ),
-                SpotifySong(
-                    uri = "spotify:album:0KeNJa8ky2LAuzKjUqz6EK",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:2KDWVRwZ75kQJ0HoqdSjpi"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d00004851f580861a26c216beecdbba5c",
-                    selected = true
-                ),
-                SpotifySong(
-                    uri = "spotify:track:4cbE108aX1pnOAPf2xyK2q",
-                    name = "Happy Mood",
-                    artistsUri = listOf("spotify:artist:0frA7bPCcyvwEKpcKD6NnJ"),
-                    album = "Happy Mood",
-                    imageUrl = "https://i.scdn.co/image/ab67616d0000485198ac1936c5f9a9d0911754b2"
-                )
-            ),
             modifier = Modifier.fillMaxSize()
         )
     }

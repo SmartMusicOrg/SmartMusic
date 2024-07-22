@@ -49,7 +49,11 @@ class ImageCapturingViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
-    fun searchSong(aiApiKey: String, aiModel: AIApi = GeminiApi) {
+    fun searchSong(
+        aiApiKey: String,
+        aiModel: AIApi = GeminiApi,
+        onNavigateToPlayerPage: () -> Unit
+    ) {
         _uiState.value =
             _uiState.value.copy(canUseSubmit = false, isLoading = true)
         viewModelScope.launch {
@@ -207,6 +211,7 @@ class ImageCapturingViewModel(application: Application) : AndroidViewModel(appli
                 }
             }
             Log.d(DEBUG_TAG, "Time taken: $time ms")
+            onNavigateToPlayerPage()
         }
     }
 

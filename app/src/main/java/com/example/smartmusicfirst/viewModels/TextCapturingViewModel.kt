@@ -59,7 +59,12 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         _uiState.value = _uiState.value.copy(recordingGranted = isAvailable)
     }
 
-    fun searchSong(corticalioAccessToken: String, aiApiKey: String, aiModel: AIApi = GeminiApi) {
+    fun searchSong(
+        corticalioAccessToken: String,
+        aiApiKey: String,
+        aiModel: AIApi = GeminiApi,
+        onNavigateToPlayerPage: () -> Unit = {}
+    ) {
         _uiState.value =
             _uiState.value.copy(canUseRecord = false, canUseSubmit = false, isLoading = true)
         viewModelScope.launch {
@@ -202,6 +207,7 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 }
             }
             Log.d(DEBUG_TAG, "Time taken: $time ms")
+            onNavigateToPlayerPage()
         }
     }
 
