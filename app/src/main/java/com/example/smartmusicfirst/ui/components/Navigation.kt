@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.smartmusicfirst.ImageNotificationUri
 import com.example.smartmusicfirst.data.Routs
 import com.example.smartmusicfirst.ui.views.ContactUsScreen
 import com.example.smartmusicfirst.ui.views.HomePageScreen
@@ -38,6 +39,9 @@ fun NavigationMenu(
                 onNavigateToImageCapturing = { navController.navigate(Routs.ImageCapturing.name) },
                 modifier = Modifier.fillMaxSize()
             )
+            if (ImageNotificationUri != null) {
+                navController.navigate(Routs.ImageCapturing.name)
+            }
         }
 
         composable(Routs.TextCapturing.name) {

@@ -19,7 +19,7 @@ fun SmartMusicScreen(
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = Routs.valueOf(backStackEntry?.destination?.route ?: Routs.HomePage.name)
+    var currentScreen = Routs.valueOf(backStackEntry?.destination?.route ?: Routs.HomePage.name)
 
     Scaffold(
         modifier = modifier,
@@ -33,6 +33,9 @@ fun SmartMusicScreen(
             BottomNavigation(navController = navController)
         }
     ) { innerPadding ->
-        NavigationMenu(navController = navController, modifier = Modifier.padding(innerPadding))
+        NavigationMenu(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding),
+        )
     }
 }

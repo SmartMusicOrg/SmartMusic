@@ -41,7 +41,8 @@ class PhotoReceiver : BroadcastReceiver() {
                                     title = "New Photo Detected",
                                     message = "A new photo has been added to your gallery.",
                                     notificationId = 1,
-                                    bitmap = bitmap
+                                    bitmap = bitmap,
+                                    image = it
                                 )
                             }
                         }

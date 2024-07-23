@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.smartmusicfirst.ImageNotificationUri
 import com.example.smartmusicfirst.R
 import com.example.smartmusicfirst.connectors.ai.ChatGptApi
 import com.example.smartmusicfirst.ui.components.LoadingPage
@@ -64,6 +65,11 @@ fun ImageCapturingScreen(
 ) {
     val context = LocalContext.current
     val uiState = imageCapturingViewModel.uiState.collectAsState()
+
+    if (ImageNotificationUri != null) {
+        imageCapturingViewModel.loadImage(Uri.parse(ImageNotificationUri))
+        ImageNotificationUri = null
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()

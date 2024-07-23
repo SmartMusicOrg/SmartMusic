@@ -4,9 +4,12 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
+import com.example.smartmusicfirst.MainActivity
 import com.example.smartmusicfirst.R
 
 object NotificationCenter {
@@ -56,8 +59,19 @@ object NotificationCenter {
         title: String,
         message: String,
         notificationId: Int,
-        bitmap: Bitmap
+        bitmap: Bitmap,
+        image: Uri
     ) {
+        val intent = Intent(context.applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        intent.putExtra("image", image.toString())
+        val pendingIntent = android.app.PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT
+        )
         val notification =
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 Notification.Builder(context, CHANNEL_ID)
@@ -66,6 +80,7 @@ object NotificationCenter {
                     .setLargeIcon(bitmap)
                     .setStyle(Notification.BigPictureStyle().bigPicture(bitmap))
                     .setSmallIcon(R.drawable.logo_app)
+                    .setContentIntent(pendingIntent)
                     .build()
             } else {
                 NotificationCompat.Builder(context, CHANNEL_ID)
@@ -75,6 +90,7 @@ object NotificationCenter {
                     .setStyle(NotificationCompat.BigPictureStyle().bigPicture(bitmap))
                     .setSmallIcon(R.drawable.logo_app)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(pendingIntent)
                     .build()
             }
         notificationManager.notify(notificationId, notification)

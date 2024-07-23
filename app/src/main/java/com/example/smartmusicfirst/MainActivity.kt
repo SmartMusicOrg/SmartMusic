@@ -15,6 +15,7 @@ import com.example.smartmusicfirst.connectors.spotify.SpotifyConnectionListener
 import com.example.smartmusicfirst.ui.views.SmartMusicScreen
 
 const val DEBUG_TAG = "Debug"
+var ImageNotificationUri: String? = null
 
 class MainActivity : ComponentActivity(), SpotifyConnectionListener {
 
@@ -22,6 +23,11 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val extra = intent.getStringExtra("image")
+        if (extra != null) {
+            Log.d(DEBUG_TAG, "Received image from notification $extra")
+            ImageNotificationUri = extra
+        }
         setContent {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -30,7 +36,7 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener {
                 SmartMusicScreen(
                     Modifier
                         .fillMaxSize()
-                        .wrapContentSize()
+                        .wrapContentSize(),
                 )
             }
         }
