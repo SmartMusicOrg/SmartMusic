@@ -57,44 +57,59 @@ android {
 
 
 dependencies {
-
+    // General
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+
+    // Compose
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation(files("../libs/spotify-app-remote-release-0.8.0.aar"))
-    implementation("com.spotify.android:auth:2.1.0")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.android.volley:volley:1.2.1")
-    implementation("androidx.browser:browser:1.8.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.compose.runtime:runtime")
-    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+    implementation("androidx.compose.runtime:runtime-rxjava2:1.6.8")
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+
+    // Material
+    implementation("androidx.compose.material3:material3")
+
+    // lifecycle
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.3")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("io.coil-kt:coil-compose:1.3.1")
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // spotify
+    implementation(files("../libs/spotify-app-remote-release-0.8.0.aar"))
+    implementation("com.spotify.android:auth:2.1.0")
+
+    // Gson and Volley
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.android.volley:volley:1.2.1")
+
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-firestore")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
-    implementation("androidx.compose.runtime:runtime-rxjava2:1.6.8")
-    implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("com.google.mlkit:image-labeling:17.0.8")
-    implementation("com.google.mlkit:translate:17.0.2")
     implementation("com.google.firebase:firebase-storage")
 
+    // Google ML Kit and services
+    implementation("com.google.mlkit:image-labeling:17.0.8")
+    implementation("com.google.mlkit:translate:17.0.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // data store
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Other
+    implementation("androidx.browser:browser:1.8.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("io.coil-kt:coil-compose:1.3.1")
+    implementation("androidx.navigation:navigation-testing:2.7.7")
+
     testImplementation("junit:junit:4.13.2")
+    testImplementation ("com.google.truth:truth:1.4.4")
+    testImplementation("junit:junit:4.12")
 
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

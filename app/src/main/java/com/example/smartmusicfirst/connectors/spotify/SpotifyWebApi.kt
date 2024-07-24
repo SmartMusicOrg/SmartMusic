@@ -64,6 +64,30 @@ object SpotifyWebApi {
         }
     }
 
+    fun testInit(applicationContext: Context) {
+        this.favoriteArtists = listOf(
+            SpotifyArtist(
+                uri = "spotify:artist:1",
+                name = "Artist 1",
+                genres = listOf("genre1", "genre2")
+            ),
+            SpotifyArtist(
+                uri = "spotify:artist:2",
+                name = "Artist 2",
+                genres = listOf("genre3", "genre4")
+            )
+        )
+        this.accessToken = "something"
+        this.applicationContext = applicationContext
+        this.currentUser = SpotifyUser(
+            uri = "spotify:user:123456789",
+            id = "123456789",
+            displayName = "Test User",
+            images = listOf("https://example.com/image.jpg"),
+            product = "premium"
+        )
+    }
+
     fun searchForPlaylist(playlistName: String, callback: (String) -> Unit) {
         val encodedPlaylistName = URLEncoder.encode(playlistName, "UTF-8")
         val url = "https://api.spotify.com/v1/search?q=$encodedPlaylistName&type=playlist&limit=3"
