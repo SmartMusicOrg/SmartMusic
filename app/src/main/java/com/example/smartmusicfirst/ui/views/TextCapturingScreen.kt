@@ -65,7 +65,8 @@ fun TextCapturingScreen(
     }
 
     LaunchedEffect(key1 = uiState.errorMessage) {
-        Toast.makeText(context, uiState.errorMessage, Toast.LENGTH_LONG).show()
+        if (uiState.errorMessage.isNotEmpty())
+            Toast.makeText(context, uiState.errorMessage, Toast.LENGTH_LONG).show()
     }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
