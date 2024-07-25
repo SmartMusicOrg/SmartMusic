@@ -1,4 +1,4 @@
-package com.example.smartmusicfirst
+package com.example.smartmusicfirst.extensions
 
 import androidx.navigation.NavController
 import org.junit.Assert

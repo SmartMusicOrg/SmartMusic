@@ -28,7 +28,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 object SpotifyWebApi {
-    private lateinit var applicationContext: Context
+    lateinit var applicationContext: Context
 
     lateinit var accessToken: String
     lateinit var currentUser: SpotifyUser
@@ -62,30 +62,6 @@ object SpotifyWebApi {
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Error adding user to firebase: ${e.message}", e)
         }
-    }
-
-    fun testInit(applicationContext: Context) {
-        this.favoriteArtists = listOf(
-            SpotifyArtist(
-                uri = "spotify:artist:1",
-                name = "Artist 1",
-                genres = listOf("genre1", "genre2")
-            ),
-            SpotifyArtist(
-                uri = "spotify:artist:2",
-                name = "Artist 2",
-                genres = listOf("genre3", "genre4")
-            )
-        )
-        this.accessToken = "something"
-        this.applicationContext = applicationContext
-        this.currentUser = SpotifyUser(
-            uri = "spotify:user:123456789",
-            id = "123456789",
-            displayName = "Test User",
-            images = listOf("https://example.com/image.jpg"),
-            product = "premium"
-        )
     }
 
     fun searchForPlaylist(playlistName: String, callback: (String) -> Unit) {

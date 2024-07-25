@@ -7,10 +7,11 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import com.example.smartmusicfirst.R
-import com.example.smartmusicfirst.assertCurrentRouteName
 import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import com.example.smartmusicfirst.data.Routs
-import com.example.smartmusicfirst.onNodeWithStringId
+import com.example.smartmusicfirst.extensions.assertCurrentRouteName
+import com.example.smartmusicfirst.extensions.onNodeWithStringId
+import com.example.smartmusicfirst.extensions.testInit
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,5 +60,12 @@ class NavigationKtTest {
         composeTestRule.onNodeWithStringId(R.string.emotionButtonsPage_title)
             .performClick()
         navController.assertCurrentRouteName(Routs.EmotionsButtons.name)
+    }
+
+    @Test
+    fun testNavigation_toContactUs() {
+        composeTestRule.onNodeWithStringId(R.string.ContactUsPage_title)
+            .performClick()
+        navController.assertCurrentRouteName(Routs.ContactUs.name)
     }
 }

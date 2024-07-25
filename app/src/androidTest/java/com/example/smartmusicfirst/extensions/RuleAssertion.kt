@@ -1,4 +1,4 @@
-package com.example.smartmusicfirst
+package com.example.smartmusicfirst.extensions
 
 import androidx.activity.ComponentActivity
 import androidx.annotation.StringRes
