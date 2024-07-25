@@ -59,6 +59,10 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
         _uiState.value = _uiState.value.copy(recordingGranted = isAvailable)
     }
 
+    fun updateCanUseSubmit(canUseSubmit: Boolean) {
+        _uiState.value = _uiState.value.copy(canUseSubmit = canUseSubmit)
+    }
+
     fun searchSong(
         corticalioAccessToken: String,
         aiApiKey: String,

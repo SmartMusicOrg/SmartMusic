@@ -88,30 +88,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         }
 
         item {
-            Text("Preferred Artists", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(vertical = 16.dp))
-        }
-
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    BasicTextField(
-                        value = uiState.artistsText,
-                        onValueChange = { viewModel.updateArtistsText(it) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small)
-                            .padding(8.dp)
-                    )
-                }
-            }
-        }
-
-        item {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
