@@ -1,0 +1,34 @@
+<resources>
+
+    <string name="app_name">SmartMusicFirst</string>
+    <string name="loading">טוען...</string>
+
+    <string name="homePage_title">ברוך הבא ל-SmartMusic!</string>
+    <string name="homePage_title_icon">בית</string>
+    <string name="greeting">שלום, %1$s!</string>
+
+    <string name="emotionButtonsPage_title">כפתורי רגשות</string>
+    <string name="emotionButtonsPage_description">בחר רגש וקבל מוזיקה מתאימה…</string>
+
+    <string name="textCapturingPage_title">לכידת טקסט</string>
+    <string name="textCapturingPage_description">תאר את החוויות שלך וקבל מוזיקה יפה…</string>
+
+
+    <string name="imageCapturingPage_title">לכידת תמונה</string>
+    <string name="imageCapturingPage_description">קבל מוזיקה הקשורה לתמונה מעניינת שיש לך…</string>
+
+    <string name="PlayerPage_title">תהנה מההאזנה</string>
+
+    <string name="NotificationsPage_title">התראות</string>
+    <string name="NotificationsPage_title_icon">חדשות</string>
+
+    <string name="SettingsPage_title">הגדרות</string>
+    <string name="SettingsPage_title_icon">הגדרות</string>
+
+    <string name="ContactUsPage_title">צור קשר</string>
+    <string name="ContactUsPage_title_icon">דואר</string>
+
+    <string name="PlaceHolderPage_title">אופס!</string>
+    <string name="title_activity_log_in">SmartMusic</string>
+
+</resources>

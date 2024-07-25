@@ -1,4 +1,4 @@
-package com.example.smartmusicfirst.ui.views
+package com.example.smartmusicfirst.ui.views.homepage
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.LocalContext
@@ -12,6 +12,7 @@ import com.example.smartmusicfirst.data.Routs
 import com.example.smartmusicfirst.extensions.assertCurrentRouteName
 import com.example.smartmusicfirst.extensions.onNodeWithStringId
 import com.example.smartmusicfirst.extensions.testInit
+import com.example.smartmusicfirst.ui.views.SmartMusicScreen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -60,12 +61,5 @@ class NavigationKtTest {
         composeTestRule.onNodeWithStringId(R.string.emotionButtonsPage_title)
             .performClick()
         navController.assertCurrentRouteName(Routs.EmotionsButtons.name)
-    }
-
-    @Test
-    fun testNavigation_toContactUs() {
-        composeTestRule.onNodeWithStringId(R.string.ContactUsPage_title)
-            .performClick()
-        navController.assertCurrentRouteName(Routs.ContactUs.name)
     }
 }

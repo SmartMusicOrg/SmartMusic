@@ -26,7 +26,7 @@ fun BottomNavigation(navController: NavHostController, modifier: Modifier = Modi
                 icon = {
                     Image(
                         painter = painterResource(id = item.icon),
-                        contentDescription = null
+                        contentDescription = item.route
                     )
                 },
                 label = {

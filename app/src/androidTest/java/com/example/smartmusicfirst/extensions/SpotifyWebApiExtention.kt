@@ -28,3 +28,21 @@ fun SpotifyWebApi.testInit(applicationContext: Context) {
         product = "premium"
     )
 }
+
+fun SpotifyWebApi.testInit(applicationContext: Context, currentUser: SpotifyUser) {
+    this.favoriteArtists = listOf(
+        SpotifyArtist(
+            uri = "spotify:artist:1",
+            name = "Artist 1",
+            genres = listOf("genre1", "genre2")
+        ),
+        SpotifyArtist(
+            uri = "spotify:artist:2",
+            name = "Artist 2",
+            genres = listOf("genre3", "genre4")
+        )
+    )
+    this.accessToken = "something"
+    this.applicationContext = applicationContext
+    this.currentUser = currentUser
+}

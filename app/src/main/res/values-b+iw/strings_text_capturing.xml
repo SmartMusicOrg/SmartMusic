@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_search_method">מתחיל חיפוש…</string>
+    <string name="keyword_extract">מחפש מילות מפתח…</string>
+    <string name="get_ai_offer">מתקשר לשירותי AI…</string>
+    <string name="songs_extract">מחפש שירים…</string>
+    <string name="build_playlist">בונה רשימת השמעה…</string>
+    <string name="search">חיפוש</string>
+</resources>
