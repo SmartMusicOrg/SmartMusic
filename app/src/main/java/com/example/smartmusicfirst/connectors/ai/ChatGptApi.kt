@@ -6,6 +6,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.smartmusicfirst.DEBUG_TAG
+import com.example.smartmusicfirst.connectors.spotify.SpotifyWebApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -60,7 +61,23 @@ object ChatGptApi : AIApi {
     override fun buildQuery(keywords: List<String>): String {
         val keywordsTemplate = keywords.joinToString(separator = ", ")
         Log.d(DEBUG_TAG, "Keywords template: $keywordsTemplate")
-        return "give me list of top fifteen popular songs that connected to the following words: $keywordsTemplate give only the list without any other world accept the list"
+        var res =
+            "I have a music application that needs to generate playlists based on user input.\n" +
+                    " The application should prioritize songs related to specific keywords over user preferences like favorite artists or genres.\n" +
+                    " Here is the data provided by the user:\n\n" +
+                    " - Keywords (ordered by significance): $keywordsTemplate\n"
+        if (SpotifyWebApi.favoriteArtists.isNotEmpty()) {
+            val artists = SpotifyWebApi.favoriteArtists.joinToString(separator = ", ") { it.name }
+            res += " - Favorite artists: $artists\n"
+            val genres = SpotifyWebApi.favoriteArtists.flatMap { it.genres }.distinct()
+            res += " - Favorite genres: ${genres.joinToString(separator = ", ")}\n"
+        }
+
+        res += "Task: Create a list of 15 songs that most closely match the given keywords, even if they do not align with the user's favorite artists or genres.\n" +
+                "Just try to take into consideration the user's preferences.\n" +
+                " give me only the list and don't add further information"
+        Log.d(DEBUG_TAG, "Ai Query: $res")
+        return res
     }
 
     override fun getSongsNamesFromAiResponse(response: String): List<String> {
@@ -69,10 +86,10 @@ object ChatGptApi : AIApi {
             val rows = response.split("\n")
             for (row in rows) {
                 if (row.isNotEmpty()) {
-                    row.replace("\"", "")
-                    row.subSequence(2, row.length).toString().let {
-                        songs.add(it)
-                    }
+                    var songToSearch = row.dropWhile { it != '.' && it != ' ' }
+                    songToSearch = songToSearch.drop(2)
+                    songToSearch = songToSearch.replace("\"", "")
+                    songs.add(songToSearch)
                 }
             }
         } catch (e: Exception) {

@@ -198,8 +198,16 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                         canUseSubmit = true,
                         isLoading = false
                     )
+                    onNavigateToPlayerPage()
 
                     //me and my girlfriend having fun together
+                } catch (e: IndexOutOfBoundsException) {
+                    Log.e(DEBUG_TAG, "Error during API calls", e)
+                    _uiState.value = _uiState.value.copy(
+                        canUseSubmit = true,
+                        errorMessage = "No songs found",
+                        isLoading = false
+                    )
                 } catch (e: Exception) {
                     Log.e(DEBUG_TAG, "Error during API calls", e)
                     _uiState.value = _uiState.value.copy(
@@ -211,7 +219,6 @@ class TextCapturingViewModel(application: Application) : AndroidViewModel(applic
                 }
             }
             Log.d(DEBUG_TAG, "Time taken: $time ms")
-            onNavigateToPlayerPage()
         }
     }
 

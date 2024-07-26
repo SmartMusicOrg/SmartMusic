@@ -200,7 +200,15 @@ class ImageCapturingViewModel(application: Application) : AndroidViewModel(appli
                         isLoading = false
                     )
 
+                    onNavigateToPlayerPage()
 
+                } catch (e: IndexOutOfBoundsException) {
+                    Log.e(DEBUG_TAG, "Error during API calls", e)
+                    _uiState.value = _uiState.value.copy(
+                        canUseSubmit = true,
+                        toastMessage = "No songs found",
+                        isLoading = false
+                    )
                 } catch (e: Exception) {
                     Log.e(DEBUG_TAG, "Error during API calls", e)
                     _uiState.value = _uiState.value.copy(
@@ -211,7 +219,6 @@ class ImageCapturingViewModel(application: Application) : AndroidViewModel(appli
                 }
             }
             Log.d(DEBUG_TAG, "Time taken: $time ms")
-            onNavigateToPlayerPage()
         }
     }
 
