@@ -30,10 +30,11 @@ fun SimpleButton(
     text: String,
     color: Color,
     modifier: Modifier = Modifier,
-    buttonEmotionViewModel: ButtonEmotionViewModel = viewModel()
+    buttonEmotionViewModel: ButtonEmotionViewModel = viewModel(),
+    onNavigateToPlayerPage: () -> Unit = {}
 ) {
     OutlinedButton(
-        onClick = { buttonEmotionViewModel.onEmotionButtonClicked(text) },
+        onClick = { buttonEmotionViewModel.onEmotionButtonClicked(text, onNavigateToPlayerPage) },
         border = ButtonDefaults.outlinedButtonBorder.copy(width = dimensionResource(id = R.dimen.border_width_medium)),
         elevation = ButtonDefaults.elevatedButtonElevation(dimensionResource(id = R.dimen.elevation_large)),
         colors = ButtonDefaults.buttonColors(containerColor = color),
@@ -50,18 +51,42 @@ fun SimpleButton(
 }
 
 @Composable
-fun MySimpleAppContainer(modifier: Modifier = Modifier) {
+fun MySimpleAppContainer(modifier: Modifier = Modifier, onNavigateToPlayerPage: () -> Unit = {}) {
     Column(
         modifier = modifier.background(color = MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        SimpleButton("Happy", color = Color(0xCF6D997C))
-        SimpleButton("Excited", color = Color(0xCFCCB874))
-        SimpleButton("Angry", color = Color(0xCFCC7474))
-        SimpleButton("Optimistic", color = Color(0xCF748DCC))
-        SimpleButton("Sad", color = Color(0xCF969696))
-        SimpleButton("Energized", color = Color(0xCF74C6CC))
+        SimpleButton(
+            "Happy",
+            color = Color(0xCF6D997C),
+            onNavigateToPlayerPage = onNavigateToPlayerPage
+        )
+        SimpleButton(
+            "Excited",
+            color = Color(0xCFCCB874),
+            onNavigateToPlayerPage = onNavigateToPlayerPage
+        )
+        SimpleButton(
+            "Angry",
+            color = Color(0xCFCC7474),
+            onNavigateToPlayerPage = onNavigateToPlayerPage
+        )
+        SimpleButton(
+            "Optimistic",
+            color = Color(0xCF748DCC),
+            onNavigateToPlayerPage = onNavigateToPlayerPage
+        )
+        SimpleButton(
+            "Sad",
+            color = Color(0xCF969696),
+            onNavigateToPlayerPage = onNavigateToPlayerPage
+        )
+        SimpleButton(
+            "Energized",
+            color = Color(0xCF74C6CC),
+            onNavigateToPlayerPage = onNavigateToPlayerPage
+        )
     }
 }
 

@@ -88,7 +88,8 @@ fun NavigationMenu(
             MySimpleAppContainer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .wrapContentSize()
+                    .wrapContentSize(),
+                onNavigateToPlayerPage = { navController.navigate(Routs.PlayerPage.name) }
             )
         }
 
