@@ -81,7 +81,7 @@ fun TextCapturingScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Text(
-                text = "Search for a song",
+                text = "Search for a playlist",
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 32.sp,
                 color = MaterialTheme.colorScheme.primary,
