@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="enter_email_subject">הכנס נושא למייל</string>
+    <string name="enter_email_body">הכנס תוכן למייל</string>
+    <string name="send_email">שלח מייל</string>
+</resources>

@@ -59,14 +59,15 @@ import java.util.Properties
 fun ImageCapturingScreen(
     modifier: Modifier = Modifier,
     onNavigateToPlayerPage: () -> Unit = {},
-    title: String = "Capture Image",
-    message: String = "Tap a button below to capture an image or select from gallery.",
+    title: String = stringResource(id = R.string.image_capturing_title),
+    message: String = stringResource(id = R.string.image_capturing_message),
     imageCapturingViewModel: ImageCapturingViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val uiState = imageCapturingViewModel.uiState.collectAsState()
 
     if (ImageNotificationUri != null) {
+        imageCapturingViewModel.setImageUri(Uri.parse(ImageNotificationUri))
         imageCapturingViewModel.loadImage(Uri.parse(ImageNotificationUri))
         ImageNotificationUri = null
     }
@@ -77,7 +78,7 @@ fun ImageCapturingScreen(
         if (success) {
             uiState.value.imageUri?.let {
                 imageCapturingViewModel.loadImage(it)
-                imageCapturingViewModel.showToast("Image captured successfully!")
+                imageCapturingViewModel.showToast(context.getString(R.string.image_capturing_success))
             }
         }
     }
@@ -88,7 +89,7 @@ fun ImageCapturingScreen(
         uri?.let {
             imageCapturingViewModel.setImageUri(it)
             imageCapturingViewModel.loadImage(it)
-            imageCapturingViewModel.showToast("Image selected from gallery!")
+            imageCapturingViewModel.showToast(context.getString(R.string.image_selected_from_gallery))
         }
     }
 
@@ -104,7 +105,11 @@ fun ImageCapturingScreen(
             imageCapturingViewModel.setImageUri(uri)
             cameraLauncher.launch(uri)
         } else {
-            Toast.makeText(context, "Permissions not granted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.image_capturing_error_permission_denied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -234,7 +239,7 @@ fun ImageCapturingScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.search), // Use your search vector drawable here
-                    contentDescription = "Search",
+                    contentDescription = stringResource(id = R.string.search),
                     modifier = Modifier.size(32.dp),
                     colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )

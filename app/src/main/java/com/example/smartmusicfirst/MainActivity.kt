@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener {
         }
         SpotifyConnection.connect(this, this)
         receiver = PhotoReceiver()
-        receiver.registerContentObserver(this)
     }
 
     override fun onStart() {
@@ -50,6 +49,7 @@ class MainActivity : ComponentActivity(), SpotifyConnectionListener {
         if (!SpotifyConnection.isConnected()) {
             SpotifyConnection.connect(this, this)
         }
+        receiver.registerContentObserver(this)
     }
 
     override fun onStop() {

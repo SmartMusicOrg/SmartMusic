@@ -3,6 +3,7 @@ package com.example.smartmusicfirst.services
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -35,7 +36,15 @@ object NotificationCenter {
 
     fun createNotification(context: Context, title: String, message: String, notificationId: Int) {
         val notification =
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                Notification.Builder(context, CHANNEL_ID)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setSmallIcon(R.drawable.logo_app)
+                    .setAutoCancel(true)
+                    .setFlag(Notification.FLAG_AUTO_CANCEL, true)
+                    .build()
+            } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 Notification.Builder(context, CHANNEL_ID)
                     .setContentTitle(title)
                     .setContentText(message)
@@ -65,15 +74,21 @@ object NotificationCenter {
         val intent = Intent(context.applicationContext, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
+        val pendingIntentFlags =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
         intent.putExtra("image", image.toString())
-        val pendingIntent = android.app.PendingIntent.getActivity(
+        val pendingIntent = PendingIntent.getActivity(
             context,
             0,
             intent,
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT
+            pendingIntentFlags
         )
         val notification =
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                 Notification.Builder(context, CHANNEL_ID)
                     .setContentTitle(title)
                     .setContentText(message)
@@ -81,6 +96,18 @@ object NotificationCenter {
                     .setStyle(Notification.BigPictureStyle().bigPicture(bitmap))
                     .setSmallIcon(R.drawable.logo_app)
                     .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setFlag(Notification.FLAG_AUTO_CANCEL, true)
+                    .build()
+            } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Notification.Builder(context, CHANNEL_ID)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setLargeIcon(bitmap)
+                    .setStyle(Notification.BigPictureStyle().bigPicture(bitmap))
+                    .setSmallIcon(R.drawable.logo_app)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
                     .build()
             } else {
                 NotificationCompat.Builder(context, CHANNEL_ID)
@@ -91,6 +118,7 @@ object NotificationCenter {
                     .setSmallIcon(R.drawable.logo_app)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
                     .build()
             }
         notificationManager.notify(notificationId, notification)

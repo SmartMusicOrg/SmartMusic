@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">SmartMusicFirst</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
 
     <string name="homePage_title">Welcome to SmartMusic!</string>
     <string name="homePage_title_icon">Home</string>
@@ -30,5 +30,7 @@
 
     <string name="PlaceHolderPage_title">Oops!</string>
     <string name="title_activity_log_in">SmartMusic</string>
+
+    <string name="search">Search</string>
 
 </resources>

@@ -15,13 +15,12 @@ import java.io.IOException
 import java.util.concurrent.Executors
 
 class PhotoReceiver : BroadcastReceiver() {
-
     private var contentObserver: ContentObserver? = null
     private val executor = Executors.newSingleThreadExecutor()
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_MEDIA_SCANNER_FINISHED) {
-            registerContentObserver(context)
+//            registerContentObserver(context)
         }
     }
 

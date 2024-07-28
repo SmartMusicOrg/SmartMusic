@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">SmartMusicFirst</string>
-    <string name="loading">טוען...</string>
+    <string name="loading">טוען…</string>
 
     <string name="homePage_title">ברוך הבא ל-SmartMusic!</string>
     <string name="homePage_title_icon">בית</string>
@@ -30,5 +30,7 @@
 
     <string name="PlaceHolderPage_title">אופס!</string>
     <string name="title_activity_log_in">SmartMusic</string>
+
+    <string name="search">חיפוש</string>
 
 </resources>
