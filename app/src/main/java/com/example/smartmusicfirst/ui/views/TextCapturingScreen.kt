@@ -81,7 +81,7 @@ fun TextCapturingScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Text(
-                text = "Search for a playlist",
+                text = stringResource(id = R.string.search_for_playlist),
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 32.sp,
                 color = MaterialTheme.colorScheme.primary,
@@ -119,7 +119,7 @@ fun TextCapturingScreen(
                 TextField(
                     value = uiState.inputString,
                     onValueChange = { textCapturingViewModel.updateInputString(it) },
-                    placeholder = { Text("Express your feelings right now") },
+                    placeholder = { Text(stringResource(id = R.string.text_capture_hint)) },
                     modifier = Modifier
                         .fillMaxHeight()
                         .padding(end = dimensionResource(id = R.dimen.padding_small)) // Added padding for better spacing

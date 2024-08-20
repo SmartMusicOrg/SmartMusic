@@ -18,13 +18,13 @@ object LocalDataSource {
                 hasNew = false,
                 iconTitle = R.string.homePage_title_icon
             ),
-            NavigationItem(
-                route = Routs.Notifications.name,
-                title = Routs.Notifications.title,
-                icon = R.drawable.notifications_icon,
-                hasNew = false,
-                iconTitle = R.string.NotificationsPage_title_icon
-            ),
+//            NavigationItem(
+//                route = Routs.Notifications.name,
+//                title = Routs.Notifications.title,
+//                icon = R.drawable.notifications_icon,
+//                hasNew = false,
+//                iconTitle = R.string.NotificationsPage_title_icon
+//            ),
             NavigationItem(
                 route = Routs.Settings.name,
                 title = Routs.Settings.title,

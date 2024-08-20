@@ -17,6 +17,7 @@ import com.example.smartmusicfirst.ui.views.ImageCapturingScreen
 import com.example.smartmusicfirst.ui.views.MySimpleAppContainer
 import com.example.smartmusicfirst.ui.views.PlaceHolderScreen
 import com.example.smartmusicfirst.ui.views.PlayerPageScreen
+import com.example.smartmusicfirst.ui.views.SettingsScreen
 import com.example.smartmusicfirst.ui.views.TextCapturingScreen
 
 @Composable
@@ -71,9 +72,7 @@ fun NavigationMenu(
         }
 
         composable(Routs.Settings.name) {
-            PlaceHolderScreen(
-                title = "Missing",
-                message = "This page is not implemented yet.",
+            SettingsScreen(
                 modifier = Modifier.fillMaxSize()
             )
         }

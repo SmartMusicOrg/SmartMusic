@@ -5,4 +5,6 @@
     <string name="get_ai_offer">מתקשר לשירותי AI…</string>
     <string name="songs_extract">מחפש שירים…</string>
     <string name="build_playlist">בונה רשימת השמעה…</string>
+    <string name="search_for_playlist">חיפוש רשימת השמעה</string>
+    <string name="text_capture_hint">הביע מה אתה מרגיש כרגע</string>
 </resources>

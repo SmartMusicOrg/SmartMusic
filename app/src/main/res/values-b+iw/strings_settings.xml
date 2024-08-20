@@ -2,4 +2,8 @@
 <resources>
     <string name="setting_title_example">דוגמה</string>
     <string name="setting_description_example">זה דוגמה להגדרת הגדרות עבור תוסף חיצוני.</string>
+    <string name="spotify_profie_data">מידע על הפרופיל של ספוטיפיי</string>
+    <string name="spotify_user_name">שם המשתמש: %s</string>
+    <string name="spotify_product">סוג מוצר: %s</string>
+    <string name="favorite_artists_list">רשימת אומנים אהובים:</string>
 </resources>

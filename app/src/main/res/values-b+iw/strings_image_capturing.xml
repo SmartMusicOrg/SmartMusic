@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="capture_image">צלם</string>
+    <string name="gallery">גלריה</string>
+    <string name="image_capturing_title">צלם תמונה</string>
+    <string name="image_capturing_message">לחץ על כפתור לצילום תמונה או לבחירה מהגלריה</string>
+    <string name="image_capturing_error">שגיאה</string>
+    <string name="image_capturing_error_message">כישלון בצילום תמונה</string>
+    <string name="image_capturing_success">תמונה צולמה בהצלחה</string>
+    <string name="image_selected_from_gallery">תמונה נבחרה מהגלריה</string>
+    <string name="image_capturing_error_permission_denied">הרשאה נדחתה</string>
+</resources>

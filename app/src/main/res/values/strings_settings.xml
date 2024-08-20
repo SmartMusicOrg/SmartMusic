@@ -2,4 +2,8 @@
 <resources>
     <string name="setting_title_example">Example</string>
     <string name="setting_description_example">This is an example setting.</string>
+    <string name="spotify_profie_data">Spotify profile data</string>
+    <string name="spotify_user_name">User name: %s</string>
+    <string name="spotify_product">Product type: %s</string>
+    <string name="favorite_artists_list">Favorite artists list:</string>
 </resources>

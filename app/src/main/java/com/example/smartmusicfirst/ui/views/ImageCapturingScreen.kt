@@ -195,12 +195,12 @@ fun ImageCapturingScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.photo_camera), // Use your camera vector drawable here
-                    contentDescription = "Capture Image",
+                    contentDescription = stringResource(id = R.string.image_capturing_title),
                     modifier = Modifier.size(32.dp),
                     colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )
                 Text(
-                    text = "Capture",
+                    text = stringResource(id = R.string.capture_image),
                     color = Color.White,
                     modifier = Modifier.padding(start = 8.dp)
                 )
@@ -218,7 +218,7 @@ fun ImageCapturingScreen(
                     colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )
                 Text(
-                    text = "Gallery",
+                    text = stringResource(id = R.string.gallery),
                     color = Color.White,
                     modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_small))
                 )

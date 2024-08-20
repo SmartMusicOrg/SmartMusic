@@ -5,4 +5,6 @@
     <string name="get_ai_offer">Call to AI…</string>
     <string name="songs_extract">Extracting songs…</string>
     <string name="build_playlist">Building the playlist…</string>
+    <string name="search_for_playlist">Search for a playlist</string>
+    <string name="text_capture_hint">Express your feelings right now</string>
 </resources>
